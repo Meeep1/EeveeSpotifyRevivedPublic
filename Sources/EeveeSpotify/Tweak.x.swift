@@ -59,7 +59,7 @@ func activatePremiumPatchingGroup() {
 }
 
 struct EeveeSpotify: Tweak {
-    static let version = "6.2.13"
+    static let version = "6.2.14"
     
     static var hookTarget: VersionHookTarget {
         let version = Bundle.main.infoDictionary!["CFBundleShortVersionString"] as! String
@@ -98,6 +98,12 @@ struct EeveeSpotify: Tweak {
                 BasePremiumPatchingGroup().activate()
                 writeDebugLog("Base premium patching activated")
             }
+            
+            // Try to activate minimal settings integration for 9.1.x
+            NSLog("[EeveeSpotify] Activating minimal settings integration for 9.1.x")
+            writeDebugLog("Activating minimal settings integration for 9.1.x")
+            V91SettingsIntegrationGroup().activate()
+            writeDebugLog("Minimal settings integration activated")
             
             NSLog("[EeveeSpotify] Initialization complete for 9.1.x (minimal mode)")
             writeDebugLog("Initialization complete for 9.1.x")
