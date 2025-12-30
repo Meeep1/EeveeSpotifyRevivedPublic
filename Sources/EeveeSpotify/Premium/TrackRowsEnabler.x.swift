@@ -2,7 +2,10 @@ import Orion
 
 class SPTFreeTierArtistHubRemoteURLResolverHook: ClassHook<NSObject> {
     typealias Group = V91PremiumPatchingGroup
-    static let targetName = "SPTFreeTierArtistHubRemoteURLResolver"
+    
+    static var targetName: String {
+        return EeveeSpotify.hookTarget == .v91 ? "UIView" : "SPTFreeTierArtistHubRemoteURLResolver"
+    }
     
     func initWithViewURI(
         _ uri: NSURL,

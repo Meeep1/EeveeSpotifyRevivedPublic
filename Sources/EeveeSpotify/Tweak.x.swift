@@ -59,7 +59,7 @@ func activatePremiumPatchingGroup() {
 }
 
 struct EeveeSpotify: Tweak {
-    static let version = "6.2.9"
+    static let version = "6.2.10"
     
     static var hookTarget: VersionHookTarget {
         let version = Bundle.main.infoDictionary!["CFBundleShortVersionString"] as! String
@@ -85,57 +85,65 @@ struct EeveeSpotify: Tweak {
         NSLog("[EeveeSpotify] Hook target: \(EeveeSpotify.hookTarget)")
         writeDebugLog("Hook target: \(EeveeSpotify.hookTarget)")
         
-        do {
-            if UserDefaults.experimentsOptions.showInstagramDestination {
-                NSLog("[EeveeSpotify] Activating Instagram destination hooks")
-                writeDebugLog("Activating Instagram destination hooks")
-                InstgramDestinationGroup().activate()
-                writeDebugLog("Instagram hooks activated successfully")
-            }
+        // For 9.1.x, only activate the absolute minimum hooks
+        if EeveeSpotify.hookTarget == .v91 {
+            NSLog("[EeveeSpotify] Minimal hook mode for Spotify 9.1.x - only activating essential hooks")
+            writeDebugLog("Minimal mode for 9.1.x - most features disabled")
             
-            if UserDefaults.darkPopUps {
-                NSLog("[EeveeSpotify] Activating dark popups hooks")
-                writeDebugLog("Activating dark popups hooks")
-                DarkPopUps().activate()
-                writeDebugLog("Dark popups hooks activated successfully")
-            }
-            
+            // Only activate the data loader service hook for basic premium patching
             if UserDefaults.patchType.isPatching {
-                NSLog("[EeveeSpotify] Activating premium patching hooks")
-                writeDebugLog("Activating premium patching hooks")
-                activatePremiumPatchingGroup()
-                writeDebugLog("Premium patching hooks activated successfully")
+                NSLog("[EeveeSpotify] Activating minimal premium patching for 9.1.x")
+                writeDebugLog("Activating minimal premium patching for 9.1.x")
+                V91PremiumPatchingGroup().activate()
+                writeDebugLog("Minimal premium patching activated")
             }
             
-            if UserDefaults.lyricsSource.isReplacingLyrics {
-                if EeveeSpotify.hookTarget == .v91 {
-                    NSLog("[EeveeSpotify] Lyrics not supported for Spotify 9.1.x")
-                    writeDebugLog("Lyrics not supported for 9.1.x - skipping")
-                } else {
-                    NSLog("[EeveeSpotify] Activating lyrics hooks")
-                    writeDebugLog("Activating lyrics hooks")
-                    BaseLyricsGroup().activate()
-                    writeDebugLog("Base lyrics hooks activated successfully")
-                    
-                    if EeveeSpotify.hookTarget == .latest {
-                        writeDebugLog("Activating modern lyrics hooks")
-                        ModernLyricsGroup().activate()
-                        writeDebugLog("Modern lyrics hooks activated successfully")
-                    }
-                    else {
-                        writeDebugLog("Activating legacy lyrics hooks")
-                        LegacyLyricsGroup().activate()
-                        writeDebugLog("Legacy lyrics hooks activated successfully")
-                    }
-                }
-            }
-            
-            NSLog("[EeveeSpotify] Swift tweak initialization completed successfully")
-            writeDebugLog("Swift tweak initialization completed successfully")
-        } catch {
-            let errorMsg = "ERROR during initialization: \(error)"
-            NSLog("[EeveeSpotify] \(errorMsg)")
-            writeDebugLog(errorMsg)
+            NSLog("[EeveeSpotify] Initialization complete for 9.1.x (minimal mode)")
+            writeDebugLog("Initialization complete for 9.1.x")
+            return
         }
+        
+        // For other versions, activate all features normally
+        if UserDefaults.experimentsOptions.showInstagramDestination {
+            NSLog("[EeveeSpotify] Activating Instagram destination hooks")
+            writeDebugLog("Activating Instagram destination hooks")
+            InstgramDestinationGroup().activate()
+            writeDebugLog("Instagram hooks activated successfully")
+        }
+        
+        if UserDefaults.darkPopUps {
+            NSLog("[EeveeSpotify] Activating dark popups hooks")
+            writeDebugLog("Activating dark popups hooks")
+            DarkPopUps().activate()
+            writeDebugLog("Dark popups hooks activated successfully")
+        }
+        
+        if UserDefaults.patchType.isPatching {
+            NSLog("[EeveeSpotify] Activating premium patching hooks")
+            writeDebugLog("Activating premium patching hooks")
+            activatePremiumPatchingGroup()
+            writeDebugLog("Premium patching hooks activated successfully")
+        }
+        
+        if UserDefaults.lyricsSource.isReplacingLyrics {
+            NSLog("[EeveeSpotify] Activating lyrics hooks")
+            writeDebugLog("Activating lyrics hooks")
+            BaseLyricsGroup().activate()
+            writeDebugLog("Base lyrics hooks activated successfully")
+            
+            if EeveeSpotify.hookTarget == .latest {
+                writeDebugLog("Activating modern lyrics hooks")
+                ModernLyricsGroup().activate()
+                writeDebugLog("Modern lyrics hooks activated successfully")
+            }
+            else {
+                writeDebugLog("Activating legacy lyrics hooks")
+                LegacyLyricsGroup().activate()
+                writeDebugLog("Legacy lyrics hooks activated successfully")
+            }
+        }
+        
+        NSLog("[EeveeSpotify] Swift tweak initialization completed successfully")
+        writeDebugLog("Swift tweak initialization completed successfully")
     }
 }
