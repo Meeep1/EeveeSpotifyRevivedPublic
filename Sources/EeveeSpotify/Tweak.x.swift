@@ -53,7 +53,7 @@ func activatePremiumPatchingGroup() {
 }
 
 struct EeveeSpotify: Tweak {
-    static let version = "6.2.5"
+    static let version = "6.2.6"
     
     static var hookTarget: VersionHookTarget {
         let version = Bundle.main.infoDictionary!["CFBundleShortVersionString"] as! String
@@ -66,8 +66,9 @@ struct EeveeSpotify: Tweak {
         case "8.9.8":
             return .lastAvailableiOS14
         case "9.1.0", "9.1.6":
-            // Explicitly handle 9.1.x versions
-            return .latest
+            // 9.1.x versions don't have modern classes like NPVScrollViewController
+            // Use iOS15 hooks for compatibility
+            return .lastAvailableiOS15
         default:
             return .latest
         }

@@ -1,0 +1,213 @@
+{"app_name":"Spotify","timestamp":"2025-12-30 01:31:57.00 -0500","app_version":"9.1.6","slice_uuid":"e6de15e9-becf-3196-825d-35a14c2cb327","build_version":"910601142","platform":2,"bundleID":"com.spotify.client","share_with_app_devs":0,"is_first_party":0,"bug_type":"309","os_version":"iPhone OS 26.2 (23C52)","roots_installed":0,"name":"Spotify","incident_id":"09DBA633-2676-4DFD-BAE4-1EBB42FD13F6"}
+{
+  "uptime" : 38000,
+  "procRole" : "Foreground",
+  "version" : 2,
+  "userID" : 501,
+  "deployVersion" : 210,
+  "modelCode" : "iPhone17,3",
+  "coalitionID" : 1412,
+  "osVersion" : {
+    "isEmbedded" : true,
+    "train" : "iPhone OS 26.2",
+    "releaseType" : "User",
+    "build" : "23C52"
+  },
+  "captureTime" : "2025-12-30 01:31:56.9737 -0500",
+  "codeSigningMonitor" : 2,
+  "incident" : "09DBA633-2676-4DFD-BAE4-1EBB42FD13F6",
+  "pid" : 7124,
+  "translated" : false,
+  "cpuType" : "ARM-64",
+  "procLaunch" : "2025-12-30 01:31:56.4831 -0500",
+  "procStartAbsTime" : 915559514859,
+  "procExitAbsTime" : 915571286967,
+  "procName" : "Spotify",
+  "procPath" : "\/private\/var\/containers\/Bundle\/Application\/652ADA78-FCA1-4350-8838-781AE467368F\/Spotify.app\/Spotify",
+  "bundleInfo" : {"CFBundleShortVersionString":"9.1.6","CFBundleVersion":"910601142","CFBundleIdentifier":"com.spotify.client","DTAppStoreToolsBuild":"17C53"},
+  "storeInfo" : {"deviceIdentifierForVendor":"20B2391C-A908-449B-8B2C-04AC2571D29C","thirdParty":true},
+  "parentProc" : "launchd",
+  "parentPid" : 1,
+  "coalitionName" : "com.spotify.client",
+  "crashReporterKey" : "f1bc03dfe4044e926e7bfe9eb8f6bbc1a42af879",
+  "appleIntelligenceStatus" : {"state":"available"},
+  "developerMode" : 1,
+  "bootProgressRegister" : "0x2000000c",
+  "wasUnlockedSinceBoot" : 1,
+  "isLocked" : 0,
+  "codeSigningID" : "com.spotify.client",
+  "codeSigningTeamID" : "8B7DF748QG",
+  "codeSigningFlags" : 570434309,
+  "codeSigningValidationCategory" : 3,
+  "codeSigningTrustLevel" : 4,
+  "codeSigningAuxiliaryInfo" : 9007199254740992,
+  "instructionByteStream" : {"beforePC":"IAAg1IEF+LfpAwC54gMDquMDBKrkAwWq5QMGquYDB6rnAwiqJgMAlA==","atPC":"IAAg1IgSgFL\/EwC56AcA+UgAgFLoAwA5IBsA0ABQC5EjGwDQYwAWkQ=="},
+  "bootSessionUUID" : "7B13D493-5A45-4C14-A4AD-B41D627F6B15",
+  "basebandVersion" : "2.20.04",
+  "exception" : {"codes":"0x0000000000000001, 0x0000000189dfdd40","rawCodes":[1,6608117056],"type":"EXC_BREAKPOINT","signal":"SIGTRAP"},
+  "termination" : {"flags":0,"code":5,"namespace":"SIGNAL","indicator":"Trace\/BPT trap: 5","byProc":"exc handler","byPid":7124},
+  "os_fault" : {"process":"Spotify"},
+  "faultingThread" : 0,
+  "threads" : [{"triggered":true,"id":769962,"threadState":{"x":[{"value":5877008904},{"value":8589934595},{"value":18446726483666796544},{"value":1},{"value":5880480384},{"value":19},{"value":32},{"value":18446726482597246976},{"value":18446744065119617024},{"value":8589934595},{"value":3},{"value":0},{"value":914903200423968},{"value":897295981991976},{"value":253952},{"value":29},{"value":10749247891483722240},{"value":855728168},{"value":0},{"value":80},{"value":6128512944},{"value":2},{"value":62},{"value":4526712272},{"value":4526632556},{"value":2},{"value":6929440268,"symbolLocation":0,"symbol":"partial apply for thunk for @callee_guaranteed () -> (@out A, @error @owned Error)"},{"value":8441240136,"symbolLocation":47632,"symbol":"InitialAllocationPool"},{"value":6128513568}],"flavor":"ARM_THREAD_STATE64","lr":{"value":6608117056},"cpsr":{"value":1610612736},"fp":{"value":6128512848},"sp":{"value":6128512720},"esr":{"value":4060086273,"description":"(Breakpoint) brk 1"},"pc":{"value":6608117056,"matchesCrashFrame":1},"far":{"value":0}},"queue":"error-handler-queue","frames":[{"imageOffset":1269056,"symbol":"_assertionFailure(_:_:file:line:flags:)","symbolLocation":172,"imageIndex":9},{"imageOffset":1128420,"symbol":"fatalError(_:file:line:)","symbolLocation":104,"imageIndex":9},{"imageOffset":41052,"imageIndex":7},{"imageOffset":84324,"imageIndex":7},{"imageOffset":61084,"imageIndex":7},{"imageOffset":6776,"symbol":"partial apply for thunk for @callee_guaranteed () -> (@out A, @error @owned Error)","symbolLocation":28,"imageIndex":10},{"imageOffset":44572,"symbol":"partial apply for thunk for @callee_guaranteed () -> (@out A, @error @owned Error)","symbolLocation":16,"imageIndex":10},{"imageOffset":5884,"symbol":"closure #1 in closure #1 in OS_dispatch_queue._syncHelper<A>(fn:execute:rescue:)","symbolLocation":192,"imageIndex":10},{"imageOffset":6816,"symbol":"partial apply for thunk for @callee_guaranteed () -> ()","symbolLocation":28,"imageIndex":10},{"imageOffset":7492,"symbol":"thunk for @escaping @callee_guaranteed () -> ()","symbolLocation":28,"imageIndex":10},{"imageOffset":112636,"symbol":"_dispatch_client_callout","symbolLocation":16,"imageIndex":11},{"imageOffset":71872,"symbol":"_dispatch_lane_barrier_sync_invoke_and_complete","symbolLocation":56,"imageIndex":11},{"imageOffset":7296,"symbol":"implicit closure #2 in implicit closure #1 in OS_dispatch_queue.asyncAndWait<A>(execute:)","symbolLocation":192,"imageIndex":10},{"imageOffset":7092,"symbol":"partial apply for implicit closure #2 in implicit closure #1 in OS_dispatch_queue.sync<A>(execute:)","symbolLocation":76,"imageIndex":10},{"imageOffset":6420,"symbol":"OS_dispatch_queue._syncHelper<A>(fn:execute:rescue:)","symbolLocation":400,"imageIndex":10},{"imageOffset":6968,"symbol":"OS_dispatch_queue.asyncAndWait<A>(execute:)","symbolLocation":140,"imageIndex":10},{"imageOffset":5684,"symbol":"OS_dispatch_queue.sync<A>(execute:)","symbolLocation":64,"imageIndex":10},{"imageOffset":60488,"imageIndex":7},{"imageOffset":59876,"imageIndex":7},{"imageOffset":76124,"imageIndex":7},{"imageOffset":28940,"imageIndex":7},{"imageOffset":38180,"imageIndex":7},{"imageOffset":30204,"imageIndex":7},{"imageOffset":32888,"imageIndex":7},{"imageOffset":775580,"imageIndex":4},{"imageOffset":60112,"imageIndex":7},{"imageOffset":816760,"imageIndex":4},{"imageOffset":777584,"imageIndex":4},{"imageOffset":138216,"symbol":"invocation function for block in dyld4::Loader::findAndRunAllInitializers(dyld4::RuntimeState&) const","symbolLocation":444,"imageIndex":12},{"imageOffset":138860,"symbol":"invocation function for block in dyld3::MachOAnalyzer::forEachInitializer(Diagnostics&, dyld3::MachOAnalyzer::VMAddrConverter const&, void (unsigned int) block_pointer, void const*) const","symbolLocation":324,"imageIndex":12},{"imageOffset":41724,"symbol":"invocation function for block in mach_o::Header::forEachSection(void (mach_o::Header::SectionInfo const&, bool&) block_pointer) const","symbolLocation":312,"imageIndex":12},{"imageOffset":27364,"symbol":"mach_o::Header::forEachLoadCommand(void (load_command const*, bool&) block_pointer) const","symbolLocation":208,"imageIndex":12},{"imageOffset":42132,"symbol":"mach_o::Header::forEachSection(void (mach_o::Header::SectionInfo const&, bool&) block_pointer) const","symbolLocation":124,"imageIndex":12},{"imageOffset":140556,"symbol":"dyld3::MachOAnalyzer::forEachInitializer(Diagnostics&, dyld3::MachOAnalyzer::VMAddrConverter const&, void (unsigned int) block_pointer, void const*) const","symbolLocation":516,"imageIndex":12},{"imageOffset":140900,"symbol":"dyld4::Loader::findAndRunAllInitializers(dyld4::RuntimeState&) const","symbolLocation":172,"imageIndex":12},{"imageOffset":288352,"symbol":"dyld4::JustInTimeLoader::runInitializers(dyld4::RuntimeState&) const","symbolLocation":36,"imageIndex":12},{"imageOffset":148040,"symbol":"dyld4::Loader::runInitializersBottomUp(dyld4::RuntimeState&, dyld3::Array<dyld4::Loader const*>&, dyld3::Array<dyld4::Loader const*>&) const","symbolLocation":308,"imageIndex":12},{"imageOffset":147944,"symbol":"dyld4::Loader::runInitializersBottomUp(dyld4::RuntimeState&, dyld3::Array<dyld4::Loader const*>&, dyld3::Array<dyld4::Loader const*>&) const","symbolLocation":212,"imageIndex":12},{"imageOffset":147524,"symbol":"dyld4::Loader::runInitializersBottomUpPlusUpwardLinks(dyld4::RuntimeState&) const::$_0::operator()() const","symbolLocation":180,"imageIndex":12},{"imageOffset":147260,"symbol":"dyld4::Loader::runInitializersBottomUpPlusUpwardLinks(dyld4::RuntimeState&) const","symbolLocation":716,"imageIndex":12},{"imageOffset":139240,"symbol":"dyld4::APIs::runAllInitializersForMain()","symbolLocation":300,"imageIndex":12},{"imageOffset":88156,"symbol":"dyld4::prepare(dyld4::APIs&, mach_o::Header const*)","symbolLocation":3256,"imageIndex":12},{"imageOffset":19928,"symbol":"start","symbolLocation":7036,"imageIndex":12}]},{"id":770016,"frames":[],"threadState":{"x":[{"value":6129119232},{"value":6411},{"value":6128582656},{"value":0},{"value":409604},{"value":18446744073709551615},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0}],"flavor":"ARM_THREAD_STATE64","lr":{"value":0},"cpsr":{"value":0},"fp":{"value":0},"sp":{"value":6129119232},"esr":{"value":1442840704,"description":"(Syscall)"},"pc":{"value":8209217720},"far":{"value":0}}},{"id":770017,"frames":[],"threadState":{"x":[{"value":6129692672},{"value":4355},{"value":6129156096},{"value":0},{"value":409604},{"value":18446744073709551615},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0}],"flavor":"ARM_THREAD_STATE64","lr":{"value":0},"cpsr":{"value":0},"fp":{"value":0},"sp":{"value":6129692672},"esr":{"value":1442840704,"description":"(Syscall)"},"pc":{"value":8209217720},"far":{"value":0}}}],
+  "usedImages" : [
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4338319360,
+    "size" : 153518080,
+    "uuid" : "e6de15e9-becf-3196-825d-35a14c2cb327",
+    "path" : "\/var\/containers\/Bundle\/Application\/652ADA78-FCA1-4350-8838-781AE467368F\/Spotify.app\/Spotify",
+    "name" : "Spotify"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4524556288,
+    "size" : 49152,
+    "uuid" : "64165d94-e0f0-399c-afdd-f587b2491171",
+    "path" : "\/private\/var\/containers\/Bundle\/Application\/652ADA78-FCA1-4350-8838-781AE467368F\/Spotify.app\/Frameworks\/MetaSmartGlassesKit.framework\/MetaSmartGlassesKit",
+    "name" : "MetaSmartGlassesKit"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4528881664,
+    "size" : 1441792,
+    "uuid" : "404b4093-4d65-35f7-8f84-a056b285624c",
+    "path" : "\/private\/var\/containers\/Bundle\/Application\/652ADA78-FCA1-4350-8838-781AE467368F\/Spotify.app\/Frameworks\/RiveRuntime.framework\/RiveRuntime",
+    "name" : "RiveRuntime"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4536221696,
+    "size" : 3817472,
+    "uuid" : "c0b4e850-ccb7-3270-928b-04a8e587c440",
+    "path" : "\/private\/var\/containers\/Bundle\/Application\/652ADA78-FCA1-4350-8838-781AE467368F\/Spotify.app\/Frameworks\/SpotifyShared.framework\/SpotifyShared",
+    "name" : "SpotifyShared"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4531208192,
+    "size" : 1064960,
+    "uuid" : "2347a4a2-95b0-3572-bd91-183b54c93281",
+    "path" : "\/private\/var\/containers\/Bundle\/Application\/652ADA78-FCA1-4350-8838-781AE467368F\/Spotify.app\/Frameworks\/EeveeSpotify.dylib",
+    "name" : "EeveeSpotify.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4524720128,
+    "size" : 32768,
+    "uuid" : "3c4a403d-34f5-384c-9861-f7a36cb6b289",
+    "path" : "\/private\/var\/containers\/Bundle\/Application\/652ADA78-FCA1-4350-8838-781AE467368F\/Spotify.app\/Frameworks\/zxPluginsInject.dylib",
+    "name" : "zxPluginsInject.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4532764672,
+    "size" : 1261568,
+    "uuid" : "e93d670b-a598-3cdd-9fd2-0113bcff5c2c",
+    "path" : "\/private\/var\/containers\/Bundle\/Application\/652ADA78-FCA1-4350-8838-781AE467368F\/Spotify.app\/Frameworks\/SwiftProtobuf.framework\/SwiftProtobuf",
+    "name" : "SwiftProtobuf"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4526571520,
+    "size" : 147456,
+    "uuid" : "bd0ff263-04df-32f9-93b1-e0693cefddbd",
+    "path" : "\/private\/var\/containers\/Bundle\/Application\/652ADA78-FCA1-4350-8838-781AE467368F\/Spotify.app\/Frameworks\/Orion.framework\/Orion",
+    "name" : "Orion"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4526833664,
+    "size" : 147456,
+    "uuid" : "9b0186ef-6dd0-3700-bace-8081685817bc",
+    "path" : "\/private\/var\/containers\/Bundle\/Application\/652ADA78-FCA1-4350-8838-781AE467368F\/Spotify.app\/Frameworks\/CydiaSubstrate.framework\/CydiaSubstrate",
+    "name" : "CydiaSubstrate"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64e",
+    "base" : 6606848000,
+    "size" : 5814176,
+    "uuid" : "3de7a915-9588-3d83-be0d-5c900ee549e0",
+    "path" : "\/usr\/lib\/swift\/libswiftCore.dylib",
+    "name" : "libswiftCore.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64e",
+    "base" : 6929395712,
+    "size" : 93369,
+    "uuid" : "79534eae-05d6-3d38-9a9a-258d3922662d",
+    "path" : "\/usr\/lib\/swift\/libswiftDispatch.dylib",
+    "name" : "libswiftDispatch.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64e",
+    "base" : 7607607296,
+    "size" : 287264,
+    "uuid" : "11c047c4-33b3-39a3-ae43-bf617cfc7d2c",
+    "path" : "\/usr\/lib\/system\/libdispatch.dylib",
+    "name" : "libdispatch.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64e",
+    "base" : 6606086144,
+    "size" : 650040,
+    "uuid" : "a4040d49-9446-38e5-842b-eb8f9c971c22",
+    "path" : "\/usr\/lib\/dyld",
+    "name" : "dyld"
+  },
+  {
+    "size" : 0,
+    "source" : "A",
+    "base" : 0,
+    "uuid" : "00000000-0000-0000-0000-000000000000"
+  }
+],
+  "sharedCache" : {
+  "base" : 6604947456,
+  "size" : 5126832128,
+  "uuid" : "74dd9380-3e90-35c9-9185-6008f9c20f1b"
+},
+  "vmSummary" : "ReadOnly portion of Libraries: Total=1.8G resident=0K(0%) swapped_out_or_unallocated=1.8G(100%)\nWritable regions: Total=89.8M written=433K(0%) resident=433K(0%) swapped_out=0K(0%) unallocated=89.3M(100%)\n\n                                VIRTUAL   REGION \nREGION TYPE                        SIZE    COUNT (non-coalesced) \n===========                     =======  ======= \nActivity Tracing                   256K        1 \nKernel Alloc Once                   32K        1 \nMALLOC                            80.7M       11 \nMALLOC guard page                 4000K        4 \nSTACK GUARD                         48K        3 \nStack                             2096K        3 \nVM_ALLOCATE (reserved)               4K        1         reserved VM address space (unallocated)\n__AUTH                            7845K      700 \n__AUTH_CONST                     101.2M     1090 \n__CTF                               824        1 \n__DATA                            61.6M     1049 \n__DATA_CONST                      41.4M     1104 \n__DATA_DIRTY                      9520K      959 \n__FONT_DATA                        2352        1 \n__INFO_FILTER                         8        1 \n__LINKEDIT                       184.7M       11 \n__OBJC_RO                         84.3M        1 \n__OBJC_RW                         3177K        1 \n__RODATA                            16K        1 \n__TEXT                             1.6G     1121 \n__TPRO_CONST                       128K        2 \ndyld private memory               1024K        1 \nmapped file                       32.7M        2 \npage table in kernel               433K        1 \nshared memory                       80K        4 \n===========                     =======  ======= \nTOTAL                              2.2G     6074 \nTOTAL, minus reserved VM space     2.2G     6074 \n",
+  "legacyInfo" : {
+  "threadTriggered" : {
+    "queue" : "error-handler-queue"
+  }
+},
+  "logWritingSignature" : "8d94ca78b96622955ec5ad1eed9ae87d5471ee6a",
+  "roots_installed" : 0,
+  "bug_type" : "309",
+  "trmStatus" : 1,
+  "trialInfo" : {
+  "rollouts" : [
+    {
+      "rolloutId" : "63508950b3714d3622fc77f7",
+      "factorPackIds" : [
+        "65667c077d68d76eab3bd9a8"
+      ],
+      "deploymentId" : 240000015
+    },
+    {
+      "rolloutId" : "64b1b9b57b7a217c6795f565",
+      "factorPackIds" : [
+        "64b1b9e69aa41116c95f6d9c"
+      ],
+      "deploymentId" : 250000003
+    }
+  ],
+  "experiments" : [
+
+  ]
+}
+}
