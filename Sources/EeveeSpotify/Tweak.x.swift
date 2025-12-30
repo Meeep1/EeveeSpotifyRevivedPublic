@@ -59,7 +59,7 @@ func activatePremiumPatchingGroup() {
 }
 
 struct EeveeSpotify: Tweak {
-    static let version = "6.2.11"
+    static let version = "6.2.12"
     
     static var hookTarget: VersionHookTarget {
         let version = Bundle.main.infoDictionary!["CFBundleShortVersionString"] as! String
@@ -90,12 +90,13 @@ struct EeveeSpotify: Tweak {
             NSLog("[EeveeSpotify] Minimal hook mode for Spotify 9.1.x - only activating essential hooks")
             writeDebugLog("Minimal mode for 9.1.x - most features disabled")
             
-            // Only activate the data loader service hook for basic premium patching
+            // Only activate the base data loader service hook for basic premium patching
+            // DO NOT activate V91PremiumPatchingGroup - it has hooks that don't work on 9.1.x
             if UserDefaults.patchType.isPatching {
-                NSLog("[EeveeSpotify] Activating minimal premium patching for 9.1.x")
-                writeDebugLog("Activating minimal premium patching for 9.1.x")
-                V91PremiumPatchingGroup().activate()
-                writeDebugLog("Minimal premium patching activated")
+                NSLog("[EeveeSpotify] Activating base premium patching for 9.1.x")
+                writeDebugLog("Activating base premium patching for 9.1.x")
+                BasePremiumPatchingGroup().activate()
+                writeDebugLog("Base premium patching activated")
             }
             
             NSLog("[EeveeSpotify] Initialization complete for 9.1.x (minimal mode)")
