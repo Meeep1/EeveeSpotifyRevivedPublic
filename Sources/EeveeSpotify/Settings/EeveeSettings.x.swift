@@ -3,7 +3,9 @@ import SwiftUI
 import UIKit
 
 class ProfileSettingsSectionHook: ClassHook<NSObject> {
-    static let targetName = "ProfileSettingsSection"
+    static var targetName: String {
+        return EeveeSpotify.hookTarget == .v91 ? "UIView" : "ProfileSettingsSection"
+    }
 
     func numberOfRows() -> Int {
         return 2
