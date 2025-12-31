@@ -80,6 +80,17 @@ class SPTFeatureSettingsRootViewControllerHook: ClassHook<UIViewController> {
         NSLog("[EeveeSpotify] Setting right bar button item...")
         target.navigationItem.rightBarButtonItem = infoButton
         
+        // Also add a visible label to prove the hook is working
+        let label = UILabel(frame: CGRect(x: 0, y: 100, width: target.view.bounds.width, height: 50))
+        label.text = "🎵 EeveeSpotify v\(EeveeSpotify.version) - Tap for info"
+        label.textAlignment = .center
+        label.backgroundColor = .systemGreen
+        label.textColor = .white
+        label.isUserInteractionEnabled = true
+        let tapGesture = UITapGestureRecognizer(target: Self.buttonHandler, action: #selector(VersionInfoButtonHandler.showVersionInfo))
+        label.addGestureRecognizer(tapGesture)
+        target.view.addSubview(label)
+        
         NSLog("[EeveeSpotify] Info button added! Current navigationItem: \(target.navigationItem)")
     }
 }
