@@ -59,7 +59,7 @@ func activatePremiumPatchingGroup() {
 }
 
 struct EeveeSpotify: Tweak {
-    static let version = "6.2.14"
+    static let version = "6.2.15"
     
     static var hookTarget: VersionHookTarget {
         let version = Bundle.main.infoDictionary!["CFBundleShortVersionString"] as! String
