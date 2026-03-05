@@ -77,6 +77,8 @@ EeveeSpotify intercepts Spotify requests to load user data, deserializes it, and
 
 The tweak also sets `trackRowsEnabled` to `true`, allowing you to see track rows and liked tracks on artist pages just like with Premium.
 
+It also includes true-shuffle behavior by disabling weighted recommendation injection in the free-tier shuffler path.
+
 ## Installation
 
 For sideloaded IPAs, we recommend using **Sideloadly** or certificate-based signing tools like **ksign** for best compatibility.
