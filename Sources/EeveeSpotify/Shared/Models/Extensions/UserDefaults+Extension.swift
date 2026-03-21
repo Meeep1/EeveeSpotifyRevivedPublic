@@ -6,6 +6,7 @@ extension UserDefaults {
     private static let musixmatchTokenKey = "musixmatchToken"
     private static let darkPopUpsKey = "darkPopUps"
     private static let patchTypeKey = "patchType"
+    private static let trueShuffleEnabledKey = "trueShuffleEnabled"
     private static let overwriteConfigurationKey = "overwriteConfiguration"
     private static let lyricsColorsKey = "lyricsColors"
     private static let lyricsOptionsKey = "lyricsOptions"
@@ -39,6 +40,15 @@ extension UserDefaults {
         }
         set (patchType) {
             container.set(patchType.rawValue, forKey: patchTypeKey)
+        }
+    }
+
+    static var trueShuffleEnabled: Bool {
+        get {
+            container.object(forKey: trueShuffleEnabledKey) as? Bool ?? true
+        }
+        set (isEnabled) {
+            container.set(isEnabled, forKey: trueShuffleEnabledKey)
         }
     }
     

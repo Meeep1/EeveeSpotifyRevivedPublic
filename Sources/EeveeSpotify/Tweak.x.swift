@@ -106,6 +106,7 @@ struct EeveeSpotify: Tweak {
 
                 writeDebugLog("Activating base premium patching for 9.1.x")
                 BasePremiumPatchingGroup().activate()
+                TrueShuffleHookInstaller.installIfEnabled()
                 writeDebugLog("Base premium patching activated")
             }
             
@@ -201,6 +202,7 @@ struct EeveeSpotify: Tweak {
             NSLog("[EeveeSpotify] Activating premium patching hooks")
             writeDebugLog("Activating premium patching hooks")
             activatePremiumPatchingGroup()
+            TrueShuffleHookInstaller.installIfEnabled()
             writeDebugLog("Premium patching hooks activated successfully")
         }
         

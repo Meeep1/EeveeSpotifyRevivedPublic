@@ -1,28 +1,82 @@
 import Foundation
-import Orion
+import ObjectiveC.runtime
 
-/// Restores deterministic-free shuffle behavior by disabling
-/// Spotify's weighted/recommended-track injection path.
-///
-/// Original implementation inspiration:
-/// https://github.com/YungSpecht/TrueShuffle
-class SPTFreeTierPlaylistTrackShufflerHook: ClassHook<NSObject> {
-    typealias Group = BasePremiumPatchingGroup
+enum TrueShuffleHookInstaller {
+    private static var didInstall = false
 
-    static var targetName: String {
-        let className = "SPTFreeTierPlaylistTrackShuffler"
-        return NSClassFromString(className) != nil ? className : "UIView"
+    private typealias WeightForTrackIMP = @convention(c) (
+        AnyObject,
+        Selector,
+        AnyObject,
+        Bool,
+        Bool
+    ) -> Double
+
+    static func installIfEnabled() {
+        guard UserDefaults.trueShuffleEnabled else {
+            writeDebugLog("True Shuffle is disabled in settings; skipping runtime hook install")
+            return
+        }
+
+        install()
     }
 
-    func weightForTrack(_ track: AnyObject, recommendedTrack: Bool, mergedList: Bool) -> Double {
-        // Force Spotify to treat tracks as non-recommended/non-merged so
-        // the weighted path does not bias order toward repeats/promotions.
-        orig.weightForTrack(track, recommendedTrack: false, mergedList: false)
-    }
+    private static func install() {
+        guard !didInstall else { return }
 
-    func weightedShuffleListWithTracks(_ tracks: AnyObject, recommendations: AnyObject) -> AnyObject? {
-        // Returning nil disables the weighted recommendation list fallback,
-        // preserving a true random shuffle path.
-        nil
+        let weightSelector = NSSelectorFromString("weightForTrack:recommendedTrack:mergedList:")
+        let weightedListSelector = NSSelectorFromString("weightedShuffleListWithTracks:recommendations:")
+
+        var classCount: UInt32 = 0
+        guard let classes = objc_copyClassList(&classCount) else {
+            writeDebugLog("True Shuffle: failed to enumerate Objective-C classes")
+            return
+        }
+        defer { free(classes) }
+
+        for index in 0 ..< Int(classCount) {
+            let cls = classes[index]
+            let className = NSStringFromClass(cls)
+
+            guard className.lowercased().contains("shuff") else {
+                continue
+            }
+
+            guard let weightMethod = class_getInstanceMethod(cls, weightSelector) else {
+                continue
+            }
+
+            let originalWeightIMP = method_getImplementation(weightMethod)
+
+            let weightBlock: @convention(block) (AnyObject, AnyObject, Bool, Bool) -> Double = {
+                object,
+                track,
+                _,
+                _
+                in
+                let original = unsafeBitCast(originalWeightIMP, to: WeightForTrackIMP.self)
+                return original(object, weightSelector, track, false, false)
+            }
+
+            method_setImplementation(weightMethod, imp_implementationWithBlock(weightBlock as Any))
+
+            if let weightedListMethod = class_getInstanceMethod(cls, weightedListSelector) {
+                let weightedListBlock: @convention(block) (AnyObject, AnyObject, AnyObject) -> AnyObject? = {
+                    _,
+                    _,
+                    _
+                    in
+                    nil
+                }
+
+                method_setImplementation(weightedListMethod, imp_implementationWithBlock(weightedListBlock as Any))
+            }
+
+            didInstall = true
+            writeDebugLog("True Shuffle hooks installed on class: \(className)")
+            return
+        }
+
+        writeDebugLog("True Shuffle: no compatible shuffle class found; feature not applied")
     }
 }
