@@ -19,9 +19,12 @@ class SPTDataLoaderServiceHook: ClassHook<NSObject>, SpotifySessionDelegate {
 
     // orion:new
     func shouldBlock(_ url: URL) -> Bool {
+        // Block core session invalidation endpoints (fixes logout issue starting 9.1.22)
         return url.isDeleteToken || url.isAccountValidate || url.isOndemandSelector
             || url.isTrialsFacade || url.isPremiumMarketing || url.isPendragonFetchMessageList
             || url.isSessionInvalidation || url.isPushkaTokens
+            || url.path.contains("session/purge") || url.path.contains("token/revoke")
+            || url.path.contains("signup/public") || url.path.contains("apresolve")
     }
 
     // orion:new
@@ -60,8 +63,13 @@ class SPTDataLoaderServiceHook: ClassHook<NSObject>, SpotifySessionDelegate {
             respondWithCustomData(Data(), task: task, session: session)
         } else if url.isPushkaTokens {
             respondWithCustomData(Data(), task: task, session: session)
-        } else if url.isSessionInvalidation {
-            respondWithCustomData(Data(), task: task, session: session)
+        } else if url.isSessionInvalidation || url.path.contains("session/purge") || url.path.contains("token/revoke") {
+            // Return synthetic OK to prevent internal logout triggers
+            respondWithCustomData("{\"status\":\"OK\"}".data(using: .utf8)!, task: task, session: session)
+        } else if url.path.contains("signup/public") {
+            respondWithCustomData("{\"status\":\"OK\"}".data(using: .utf8)!, task: task, session: session)
+        } else if url.path.contains("apresolve") {
+            respondWithCustomData("{\"status\":\"OK\"}".data(using: .utf8)!, task: task, session: session)
         }
         orig.URLSession(session, task: task, didCompleteWithError: nil)
     }
