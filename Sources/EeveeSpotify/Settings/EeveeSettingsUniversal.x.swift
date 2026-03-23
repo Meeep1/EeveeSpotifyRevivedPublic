@@ -212,8 +212,92 @@ class SettingsNavigationStackHook: ClassHook<UINavigationController> {
         let checkBlock = {
             let className = String(describing: type(of: targetVC))
             
-            // Check title
-            if let title = targetVC.title, title == "Settings" {
+            // Check title - localized "Settings" / "Preferences" in Spotify-supported languages
+            let settingsTitles: Set<String> = [
+                // English
+                "Settings", "Preferences",
+                // German
+                "Einstellungen", "Präferenzen",
+                // French
+                "Paramètres", "Préférences",
+                // Spanish
+                "Configuración", "Ajustes", "Preferencias",
+                // Italian
+                "Impostazioni", "Preferenze",
+                // Portuguese
+                "Definições", "Configurações", "Preferências",
+                // Dutch
+                "Instellingen", "Voorkeuren",
+                // Turkish
+                "Ayarlar", "Tercihler",
+                // Polish
+                "Ustawienia", "Preferencje",
+                // Russian
+                "Настройки", "Параметры",
+                // Ukrainian
+                "Налаштування", "Параметри",
+                // Czech
+                "Nastavení", "Předvolby",
+                // Swedish
+                "Inställningar",
+                // Norwegian
+                "Innstillinger",
+                // Danish
+                "Indstillinger",
+                // Finnish
+                "Asetukset",
+                // Hungarian
+                "Beállítások",
+                // Romanian
+                "Setări", "Preferințe",
+                // Slovak
+                "Nastavenia",
+                // Croatian/Bosnian/Serbian
+                "Postavke", "Podešavanja",
+                // Slovenian
+                "Nastavitve",
+                // Bulgarian
+                "Настройки",
+                // Greek
+                "Ρυθμίσεις", "Προτιμήσεις",
+                // Hebrew
+                "הגדרות", "העדפות",
+                // Arabic
+                "الإعدادات", "التفضيلات",
+                // Persian
+                "تنظیمات", "ترجیحات",
+                // Japanese
+                "設定", "環境設定",
+                // Korean
+                "설정", "환경설정",
+                // Chinese (Simplified)
+                "设置", "偏好设置",
+                // Chinese (Traditional)
+                "設定", "偏好設定",
+                // Thai
+                "การตั้งค่า",
+                // Vietnamese
+                "Cài đặt", "Tùy chọn",
+                // Indonesian
+                "Pengaturan", "Setelan", "Preferensi",
+                // Malay
+                "Tetapan", "Keutamaan",
+                // Filipino
+                "Mga Setting", "Mga Kagustuhan",
+                // Hindi
+                "सेटिंग", "प्राथमिकताएं",
+                // Bengali
+                "সেটিংস",
+                // Tamil
+                "அமைப்புகள்",
+                // Catalan
+                "Configuració", "Preferències",
+                // Basque
+                "Ezarpenak",
+                // Galician
+                "Configuración", "Preferencias",
+            ]
+            if let title = targetVC.title, settingsTitles.contains(title) {
                 NSLog("[EeveeSpotify] Detected Settings via Title: \(className)")
                 injectEeveeButton(into: targetVC)
                 return

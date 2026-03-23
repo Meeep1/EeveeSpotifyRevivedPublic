@@ -19,13 +19,11 @@ static void writeDebugLog(NSString *message) {
 __attribute__((constructor)) static void init() {
     @try {
         NSLog(@"[EeveeSpotify] Initializing tweak...");
-        writeDebugLog(@"Tweak initialization starting");
         
         // Initialize Orion - do not remove this line.
         orion_init();
         
         NSLog(@"[EeveeSpotify] Tweak initialized successfully");
-        writeDebugLog(@"Orion initialized successfully");
         // Custom initialization code goes here.
     }
     @catch (NSException *exception) {

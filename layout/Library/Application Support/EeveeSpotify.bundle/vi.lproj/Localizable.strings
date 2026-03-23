@@ -8,7 +8,7 @@ experiments = "Thử nghiệm";
 common_issues_tip_title = "Gặp vấn đề?";
 
 common_issues_tip_message = "Nếu bạn đang gặp sự cố, ví dụ như không thể phát bất kỳ bài hát nào, hãy xem qua mục";
-common_issues_tip_button = "Các vấn đề thường gặp";
+common_issues_tip_button = "Những vấn đề thường gặp";
 
 reset_data = "Đặt lại dữ liệu";
 reset_data_description = "Xóa dữ liệu bộ nhớ đệm và khởi động lại ứng dụng.";
@@ -20,10 +20,10 @@ restart_is_required_description = "Cần khởi động lại ứng dụng sau k
 
 // Patching
 
-do_not_patch_premium = "Giữ nguyên Premium gốc";
+do_not_patch_premium = "Không vá Premium";
 patching_description = "EeveeSpotify chặn các yêu cầu tải dữ liệu người dùng, giải mã và chỉnh sửa các tham số theo thời gian thực.
 
-Nếu bạn đang có gói Premium hoạt động, bạn có thể bật 'Giữ nguyên Premium gốc'. Tinh chỉnh này sẽ không vá dữ liệu hoặc hạn chế việc sử dụng các tính năng Premium phía máy chủ (server-sided).
+Nếu bạn đang có gói Premium hoạt động, bạn có thể bật 'Không vá Premium'. Tinh chỉnh này sẽ không vá dữ liệu hoặc hạn chế việc sử dụng các tính năng Premium phía máy chủ (server-sided).
 
 %@";
 
@@ -36,11 +36,11 @@ do_not_replace_lyrics = "Không thay thế lời bài hát";
 lyrics_source = "Nguồn lời bài hát";
 lyrics_source_description = "Bạn có thể chọn nguồn lời bài hát mong muốn.
 
-Genius: Cung cấp lời bài hát chất lượng nhất, số lượng bài nhiều nhất và cập nhật nhanh nhất. Đã, đang và sẽ không bao giờ hỗ trợ đồng bộ thời gian (time-synced).
+Genius: Cung cấp lời bài hát chất lượng nhất, số lượng bài nhiều nhất và cập nhật nhanh nhất. Sẽ không bao giờ hỗ trợ đồng bộ thời gian (time-synced).
 
-LRCLIB: Dịch vụ mở nhất, cung cấp lời bài hát đồng bộ thời gian. Tuy nhiên nguồn này còn thiếu lời cho nhiều bài hát.
+LRCLIB: Dịch vụ mã nguồn mở nhất, cung cấp lời bài hát đồng bộ thời gian. Tuy nhiên nguồn này còn thiếu lời cho nhiều bài hát.
 
-Musixmatch: Dịch vụ mà Spotify sử dụng. Cung cấp lời bài hát đồng bộ cho nhiều bài, nhưng bạn cần có User Token để sử dụng nguồn này.";
+Musixmatch: Dịch vụ mà Spotify sử dụng. Cung cấp lời bài hát đồng bộ cho nhiều bài, nhưng bạn cần có Token người dùng để sử dụng nguồn này.";
 lyrics_additional_info = "Nếu EeveeSpotify không tìm thấy bài hát hoặc không thể xử lý lời, bạn sẽ thấy thông báo \"Không thể tải lời cho bài hát này\". Lời bài hát từ Genius có thể bị sai ở một số bài do cách tinh chỉnh thực hiện tìm kiếm. Tôi đã cố gắng để nó hoạt động trong hầu hết các trường hợp.";
 petitlyrics_description = "PetitLyrics: Cung cấp nhiều lời bài hát tiếng Nhật đồng bộ thời gian và một số bài quốc tế.";
 
@@ -55,7 +55,7 @@ genius_fallback_description = "Tải lời từ Genius nếu gặp vấn đề v
 
 show_fallback_reasons = "Hiển thị lý do dùng dự phòng";
 
-hide_lyrics_on_error = "Ẩn khi lỗi";
+hide_lyrics_on_error = "Ẩn lời bài hát nếu lỗi";
 hide_lyrics_on_error_description = "Xóa thành phần lời bài hát nếu tải thất bại.";
 
 romanized_lyrics = "Phiên âm Latin (Romaji)";
@@ -91,8 +91,8 @@ livecontainer_sharing_description = "Chia sẻ tới LiveContainer và sao chép
 
 have_premium_popup = "Có vẻ như bạn đang có gói Premium hoạt động, nên tinh chỉnh sẽ không vá dữ liệu hay hạn chế việc sử dụng các tính năng Premium phía máy chủ. Bạn có thể quản lý điều này trong cài đặt EeveeSpotify.";
 
-high_audio_quality_popup = "Chất lượng âm thanh 'Rất cao' là tính năng phía máy chủ và không khả dụng với tinh chỉnh này.";
-playlist_downloading_popup = "Tải xuống danh sách phát gốc (Native playlist downloading) là tính năng phía máy chủ và không khả dụng với tinh chỉnh này. Tuy nhiên, bạn vẫn có thể tải các tập podcast và danh sách phát cục bộ.";
+high_audio_quality_popup = "Chất lượng âm thanh 'Rất cao' là tính năng phía máy chủ (server-sided) và không khả dụng với tinh chỉnh này.";
+playlist_downloading_popup = "Tải xuống danh sách phát gốc (Native playlist downloading) là tính năng phía máy chủ (server-sided) và không khả dụng với tinh chỉnh này. Tuy nhiên, bạn vẫn có thể tải các tập podcast và danh sách phát cục bộ.";
 download_local_playlist = "Tải xuống danh sách phát cục bộ";
 
 //
@@ -128,7 +128,7 @@ liked_songs = "Bài hát đã thích";
 contributors = "Người đóng góp";
 
 request_anonymous_token = "Yêu cầu Token ẩn danh";
-request_anonymous_token_description = "Chạm vào “Yêu cầu Token ẩn danh” để lấy token từ Musixmatch mà không cần đăng nhập.";
+request_anonymous_token_description = "Chạm vào “Yêu cầu Token ẩn danh” để lấy Token từ Musixmatch mà không cần đăng nhập.";
 
 lrclib_api = "Địa chỉ máy chủ";
 

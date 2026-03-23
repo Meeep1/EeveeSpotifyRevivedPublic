@@ -22,7 +22,6 @@ private let petitLyricsRepository = PetitLyricsRepository()
 private func loadCustomLyricsForTrackId(_ trackId: String) throws -> Lyrics {
     
     let source = UserDefaults.lyricsSource
-    writeDebugLog("loadCustomLyricsForTrackId: \(trackId), Source: \(source)")
     
     // Always clear captured metadata to ensure we fetch fresh info
     var currentTitle: String? = nil
@@ -37,7 +36,6 @@ private func loadCustomLyricsForTrackId(_ trackId: String) throws -> Lyrics {
         currentTitle = title
         currentArtist = artist
         hasMetadata = true
-        writeDebugLog("Metadata cache hit: \(title) - \(artist)")
     }
     
     // Fetch if missing
@@ -57,13 +55,9 @@ private func loadCustomLyricsForTrackId(_ trackId: String) throws -> Lyrics {
                 capturedTrackId = trackId
                 capturedTrackTitle = currentTitle
                 capturedArtistName = currentArtist
-                
-                writeDebugLog("Metadata captured from Player: \(currentTitle!) - \(currentArtist!)")
             } else {
-                writeDebugLog("Player track ID mismatch. Player: \(currentId), Requested: \(trackId)")
             }
         } else {
-             writeDebugLog("Player or CurrentTrack is nil")
         }
 
         if !hasMetadata {
@@ -77,19 +71,14 @@ private func loadCustomLyricsForTrackId(_ trackId: String) throws -> Lyrics {
                     capturedTrackId = trackId
                     capturedTrackTitle = currentTitle
                     capturedArtistName = currentArtist
-                    
-                    writeDebugLog("Metadata captured from API: \(currentTitle!) - \(currentArtist!)")
                 } else {
-                    writeDebugLog("Metadata API fetch failed")
                 }
             } else {
-                writeDebugLog("No Access Token available for API fetch")
             }
         }
     }
     
     if needsMetadata && !hasMetadata {
-        writeDebugLog("Missing metadata for lyrics fetch. Aborting.")
         throw LyricsError.noSuchSong
     }
     

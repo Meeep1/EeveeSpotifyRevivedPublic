@@ -81,12 +81,6 @@ jobs:
           sudo mv ivinject-arm64 /usr/local/bin/
           sudo chmod +x /usr/local/bin/ivinject-arm64
 
-      - name: Setup ipapatch
-        run: |
-          wget https://github.com/asdfzxcvbn/ipapatch/releases/download/v2.1.0/ipapatch.macos-arm64
-          sudo mv ipapatch.macos-arm64 /usr/local/bin/ipapatch
-          sudo chmod +x /usr/local/bin/ipapatch
-
       - name: Remove Watch App from IPA
         run: |
           unzip -q spotify.ipa -d spotify_temp
@@ -105,7 +99,7 @@ jobs:
             -s - -d --level Optimal
 
       - name: Create Patched Package
-        run: ipapatch -input EeveeSpotify.ipa -output EeveeSpotify-patched.ipa
+        run: cp EeveeSpotify.ipa EeveeSpotify-patched.ipa
    
       - name: Upload to GitHub Releases
         uses: softprops/action-gh-release@v2.0.1

@@ -4,8 +4,8 @@ set -e
 # Local IPA build script for EeveeSpotify
 # This script matches the GitHub Actions workflow but runs locally
 
-SPOTIFY_IPA="${1:-Decrypted IPA/com.spotify.client_9.1.22_und3fined.ipa}"
-VERSION="6.5.3"
+SPOTIFY_IPA="${1:-Decrryted IPA/com.spotify.client-9.1.28-Decrypted.ipa}"
+VERSION="6.6.2"
 OUTPUT_DIR="Outputs/IPAS"
 
 # Determine package scheme (rootful=arm, rootless=arm64)
@@ -31,6 +31,14 @@ echo "EeveeSpotify version: $VERSION"
 echo "Input: $SPOTIFY_IPA"
 echo "======================================"
 
+# Find the .deb package
+DEB_FILE=$(ls -1t packages/com.eevee.spotify_${VERSION}*_iphoneos-${ARCH}*.deb 2>/dev/null | head -1)
+if [ -z "$DEB_FILE" ]; then
+  echo "ERROR: No matching .deb found in packages/ for version $VERSION arch $ARCH"
+  exit 1
+fi
+echo "DEB: $DEB_FILE"
+
 # Ensure output directory exists
 mkdir -p "$OUTPUT_DIR"
 
@@ -41,15 +49,15 @@ ivinject-arm64 \
   "$SPOTIFY_IPA" \
   "$BASE_IPA" \
   --overwrite \
-  -i "packages/com.eevee.spotify_${VERSION}_iphoneos-${ARCH}.deb" \
+  -i "$DEB_FILE" \
      "${THEOS}/lib/iphone/rootless/SwiftProtobuf.framework" \
      "/tmp/ees-ipa/OpenSpotifySafariExtension/OpenSpotifySafariExtension.appex" \
   -s - -d --level Optimal \
   -r Watch
 
 echo ""
-echo "Step 2/4: Applying ipapatch..."
-ipapatch -input "$BASE_IPA" -output "$PATCHED_IPA"
+echo "Step 2/4: Copying base IPA to patched output..."
+cp "$BASE_IPA" "$PATCHED_IPA"
 
 echo ""
 echo "Step 3/4: Stripping Watch bundle (if any remains)..."

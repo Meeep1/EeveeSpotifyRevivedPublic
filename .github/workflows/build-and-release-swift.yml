@@ -127,12 +127,6 @@ jobs:
         sudo mv ivinject-arm64 /usr/local/bin/
         sudo chmod +x /usr/local/bin/ivinject-arm64
 
-    - name: Setup ipapatch
-      run: |
-        wget https://github.com/asdfzxcvbn/ipapatch/releases/download/v2.1.0/ipapatch.macos-arm64
-        sudo mv ipapatch.macos-arm64 /usr/local/bin/ipapatch
-        sudo chmod +x /usr/local/bin/ipapatch
-
     - name: Check Version
       env:
         GH_TOKEN: ${{ github.token }}
@@ -154,7 +148,7 @@ jobs:
         EEVEESPOTIFY_PATCHED_PACKAGE="EeveeSpotify-${EEVEESPOTIFY_VERSION}-${SPOTIFY_VERSION}-patched.ipa"
         echo "EEVEESPOTIFY_PATCHED_PACKAGE=$EEVEESPOTIFY_PATCHED_PACKAGE" >> $GITHUB_ENV
 
-        ipapatch -input "$EEVEESPOTIFY_PACKAGE" -output "$EEVEESPOTIFY_PATCHED_PACKAGE"
+        cp "$EEVEESPOTIFY_PACKAGE" "$EEVEESPOTIFY_PATCHED_PACKAGE"
 
     - name: Compose Changelog
       if: env.LATEST_EEVEESPOTIFY_VERSION != env.EEVEESPOTIFY_VERSION

@@ -58,7 +58,10 @@ class SpotifySessionDelegateBootstrapHook: ClassHook<NSObject>, SpotifySessionDe
         }
         
         if error == nil && url.isBootstrap {
-            let buffer = URLSessionHelper.shared.obtainData(for: url)!
+            guard let buffer = URLSessionHelper.shared.obtainData(for: url) else {
+                orig.URLSession(session, task: task, didCompleteWithError: error)
+                return
+            }
             
             do {
                 var bootstrapMessage = try BootstrapMessage(serializedBytes: buffer)
@@ -70,7 +73,10 @@ class SpotifySessionDelegateBootstrapHook: ClassHook<NSObject>, SpotifySessionDe
                     }
                     else {
                         UserDefaults.patchType = .requests
-                        activatePremiumPatchingGroup()
+                        // Dispatch to main thread — calling activate() (method swizzling) from
+                        // a URLSession delegate background thread while inside the method being
+                        // swizzled is not thread-safe and causes a first-launch crash.
+                        DispatchQueue.main.async { activatePremiumPatchingGroup() }
                     }
                     
                 }
@@ -83,7 +89,6 @@ class SpotifySessionDelegateBootstrapHook: ClassHook<NSObject>, SpotifySessionDe
                         dataTask: task,
                         didReceiveData: try bootstrapMessage.serializedBytes()
                     )
-                    
                 }
                 else {
                     orig.URLSession(session, dataTask: task, didReceiveData: buffer)

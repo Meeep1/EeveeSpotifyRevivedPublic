@@ -47,7 +47,7 @@ struct EeveeSettingsVersionView: View {
             }
         } footer: {
             VStack(alignment: .leading) {
-                Text("v\(EeveeSpotify.version)")
+                Text("v\(EeveeSpotify.version) (build \(EeveeSpotify.buildNumber))")
                 
                 if latestVersion == nil {
                     HStack(spacing: 10) {

@@ -18,6 +18,7 @@ packages/
 "Decrypted IPA/"
 "Tweaked IPA/"
 Debs/
+*.log
 
 # Local Xcode and build artifacts
 *.xcuserstate
