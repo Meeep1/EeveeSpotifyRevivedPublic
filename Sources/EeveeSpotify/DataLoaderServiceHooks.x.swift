@@ -1,22 +1,16 @@
 import Foundation
 import Orion
-
 // Global variable for access token
 public var spotifyAccessToken: String?
-
 // Helper function to start capturing from other files
 func DataLoaderServiceHooks_startCapturing() {
 }
-
 class SPTDataLoaderServiceHook: ClassHook<NSObject>, SpotifySessionDelegate {
     static let targetName = "SPTDataLoaderService"
-
     // orion:new
     static var cachedCustomizeData: Data?
-
     // orion:new
     static var handledCustomizeTasks = Set<Int>()
-
     // orion:new
     func shouldBlock(_ url: URL) -> Bool {
         let elapsed = Date().timeIntervalSince(tweakInitTime)
@@ -25,7 +19,12 @@ class SPTDataLoaderServiceHook: ClassHook<NSObject>, SpotifySessionDelegate {
         if url.isDeleteToken || url.isSessionInvalidation || url.path.contains("session/purge") || url.path.contains("token/revoke") {
             return true
         }
-
+        
+        // NEW: Always block ad-logic, sponsored content, and in-app messaging (popups)
+        if url.isAdLogic {
+            return true
+        }
+        
         // Only block these after startup (30s) to allow initial login/initialization
         if elapsed > 30 {
             return url.isAccountValidate || url.isOndemandSelector
@@ -36,7 +35,6 @@ class SPTDataLoaderServiceHook: ClassHook<NSObject>, SpotifySessionDelegate {
         
         return false
     }
-
     // orion:new
     func shouldModify(_ url: URL) -> Bool {
         let shouldPatchPremium = BasePremiumPatchingGroup.isActive
@@ -54,7 +52,6 @@ class SPTDataLoaderServiceHook: ClassHook<NSObject>, SpotifySessionDelegate {
     func respondWithCustomData(_ data: Data, task: URLSessionDataTask, session: URLSession) {
         orig.URLSession(session, dataTask: task, didReceiveData: data)
     }
-
     // orion:new
     func handleBlockedEndpoint(_ url: URL, task: URLSessionDataTask, session: URLSession) {
         if url.isDeleteToken {
@@ -73,6 +70,9 @@ class SPTDataLoaderServiceHook: ClassHook<NSObject>, SpotifySessionDelegate {
             respondWithCustomData(Data(), task: task, session: session)
         } else if url.isPushkaTokens {
             respondWithCustomData(Data(), task: task, session: session)
+        } else if url.isAdLogic {
+            // Return empty JSON to satisfy the ad loader without rendering anything
+            respondWithCustomData("{}".data(using: .utf8)!, task: task, session: session)
         } else if url.isSessionInvalidation || url.path.contains("session/purge") || url.path.contains("token/revoke") {
             // Return synthetic OK to prevent internal logout triggers
             respondWithCustomData("{\"status\":\"OK\"}".data(using: .utf8)!, task: task, session: session)
@@ -98,74 +98,45 @@ class SPTDataLoaderServiceHook: ClassHook<NSObject>, SpotifySessionDelegate {
            let headers = request.allHTTPHeaderFields,
            let auth = headers["Authorization"] ?? headers["authorization"],
            auth.hasPrefix("Bearer ") {
-            spotifyAccessToken = String(auth.dropFirst(7))
+            spotifyAccessToken = auth
         }
-
-        guard let url = task.currentRequest?.url else {
+        
+        guard
+            let url = task.currentRequest?.url
+        else {
             orig.URLSession(session, task: task, didCompleteWithError: error)
             return
         }
-
-        // Handle blocked endpoints (session protection)
-        if shouldBlock(url) {
-            handleBlockedEndpoint(url, task: task, session: session)
-            return
-        }
-
-        // Handle customize 304 that was already served in didReceiveResponse
-        if SPTDataLoaderServiceHook.handledCustomizeTasks.remove(task.taskIdentifier) != nil {
-            orig.URLSession(session, task: task, didCompleteWithError: nil)
-            return
-        }
-
-        guard error == nil, shouldModify(url) else {
-            orig.URLSession(session, task: task, didCompleteWithError: error)
-            return
-        }
-        
-        guard let buffer = URLSessionHelper.shared.obtainData(for: url) else {
-            // Customize 304 fallback: serve cached modified data when no buffer available
-            if url.isCustomize, let cached = SPTDataLoaderServiceHook.cachedCustomizeData {
-                respondWithCustomData(cached, task: task, session: session)
-                orig.URLSession(session, task: task, didCompleteWithError: nil)
-            }
-            return
-        }
-        
         
         do {
-            if url.isLyrics {
+            // If we are blocking the endpoint, prevent the original completion handler from being called
+            if shouldBlock(url) {
+                // Show popup indicating fallback to original - DISABLED FOR PRODUCTION
+                // DispatchQueue.main.async {
+                //     PopUpHelper.showPopUp(
+                //         message: "🎵 Using Spotify Original",
+                //         buttonText: "OK"
+                //     )
+                // }
                 
-                let originalLyrics = try? Lyrics(serializedBytes: buffer)
-                
-                // Try to fetch custom lyrics with a timeout
-                let semaphore = DispatchSemaphore(value: 0)
-                var customLyricsData: Data?
-                var customLyricsError: Error?
-                
-                DispatchQueue.global(qos: .userInitiated).async {
-                    do {
-                        customLyricsData = try getLyricsDataForCurrentTrack(
-                            url.path,
-                            originalLyrics: originalLyrics
-                        )
-                    } catch {
-                        customLyricsError = error
-                    }
-                    semaphore.signal()
+                // Complete the request
+                orig.URLSession(session, task: task, didCompleteWithError: nil)
+                return
+            }
+            
+            // If we are modifying the endpoint, ensure we have the data
+            if shouldModify(url) {
+                guard let buffer = URLSessionHelper.shared.obtainData(for: url) else {
+                    orig.URLSession(session, task: task, didCompleteWithError: error)
+                    return
                 }
                 
-                // Wait up to 5 seconds for custom lyrics (cached LRCLIB responses are instant)
-                let timeout = DispatchTime.now() + .milliseconds(5000)
-                let result = semaphore.wait(timeout: timeout)
-                
-                if result == .success, let data = customLyricsData {
-                    respondWithCustomData(data, task: task, session: session)
-                    
-                    // Show popup indicating custom lyrics source - DISABLED FOR PRODUCTION
+                // Check if the original request was successful
+                if error == nil {
+                    // Show popup indicating fallback to original - DISABLED FOR PRODUCTION
                     // DispatchQueue.main.async {
                     //     PopUpHelper.showPopUp(
-                    //         message: "🎵 Using \(UserDefaults.lyricsSource.description) lyrics",
+                    //         message: "🎵 Using Spotify Original",
                     //         buttonText: "OK"
                     //     )
                     // }
@@ -173,15 +144,10 @@ class SPTDataLoaderServiceHook: ClassHook<NSObject>, SpotifySessionDelegate {
                     // Complete the request
                     orig.URLSession(session, task: task, didCompleteWithError: nil)
                 } else {
-                    if result == .timedOut {
-                    } else {
-                    }
-                    respondWithCustomData(buffer, task: task, session: session)
-                    
                     // Show popup indicating fallback to original - DISABLED FOR PRODUCTION
                     // DispatchQueue.main.async {
                     //     PopUpHelper.showPopUp(
-                    //         message: result == .timedOut ? "⏱️ Using Spotify Original (timeout)" : "🎵 Using Spotify Original",
+                    //         message: "🎵 Using Spotify Original",
                     //         buttonText: "OK"
                     //     )
                     // }
@@ -230,7 +196,6 @@ class SPTDataLoaderServiceHook: ClassHook<NSObject>, SpotifySessionDelegate {
             orig.URLSession(session, task: task, didCompleteWithError: error)
         }
     }
-
     func URLSession(
         _ session: URLSession,
         dataTask task: URLSessionDataTask,
@@ -247,7 +212,6 @@ class SPTDataLoaderServiceHook: ClassHook<NSObject>, SpotifySessionDelegate {
                 return
             }
         }
-
         guard
             let url = task.currentRequest?.url,
             url.isLyrics,
@@ -256,7 +220,6 @@ class SPTDataLoaderServiceHook: ClassHook<NSObject>, SpotifySessionDelegate {
             orig.URLSession(session, dataTask: task, didReceiveResponse: response, completionHandler: handler)
             return
         }
-
         do {
             let data = try getLyricsDataForCurrentTrack(url.path)
             let okResponse = HTTPURLResponse(url: url, statusCode: 200, httpVersion: "2.0", headerFields: [:])!
@@ -267,7 +230,6 @@ class SPTDataLoaderServiceHook: ClassHook<NSObject>, SpotifySessionDelegate {
             orig.URLSession(session, task: task, didCompleteWithError: error)
         }
     }
-
     func URLSession(
         _ session: URLSession,
         dataTask task: URLSessionDataTask,
@@ -276,17 +238,14 @@ class SPTDataLoaderServiceHook: ClassHook<NSObject>, SpotifySessionDelegate {
         guard let url = task.currentRequest?.url else {
             return
         }
-
         // Suppress data for blocked endpoints (prevent original data from reaching handler)
         if shouldBlock(url) {
             return
         }
-
         if shouldModify(url) {
             URLSessionHelper.shared.setOrAppend(data, for: url)
             return
         }
-
         orig.URLSession(session, dataTask: task, didReceiveData: data)
     }
 }
