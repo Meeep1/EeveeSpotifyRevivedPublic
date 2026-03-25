@@ -1,10 +1,6 @@
 import Foundation
 import Orion
-// Global variable for access token
-public var spotifyAccessToken: String?
-// Helper function to start capturing from other files
-func DataLoaderServiceHooks_startCapturing() {
-}
+
 class SPTDataLoaderServiceHook: ClassHook<NSObject>, SpotifySessionDelegate {
     static let targetName = "SPTDataLoaderService"
     // orion:new
@@ -111,19 +107,10 @@ class SPTDataLoaderServiceHook: ClassHook<NSObject>, SpotifySessionDelegate {
         do {
             // If we are blocking the endpoint, prevent the original completion handler from being called
             if shouldBlock(url) {
-                // Show popup indicating fallback to original - DISABLED FOR PRODUCTION
-                // DispatchQueue.main.async {
-                //     PopUpHelper.showPopUp(
-                //         message: "🎵 Using Spotify Original",
-                //         buttonText: "OK"
-                //     )
-                // }
-                
-                // Complete the request
-                orig.URLSession(session, task: task, didCompleteWithError: nil)
+                handleBlockedEndpoint(url, task: task, session: session)
                 return
             }
-            
+
             // If we are modifying the endpoint, ensure we have the data
             if shouldModify(url) {
                 guard let buffer = URLSessionHelper.shared.obtainData(for: url) else {
@@ -131,70 +118,47 @@ class SPTDataLoaderServiceHook: ClassHook<NSObject>, SpotifySessionDelegate {
                     return
                 }
                 
-                // Check if the original request was successful
-                if error == nil {
-                    // Show popup indicating fallback to original - DISABLED FOR PRODUCTION
-                    // DispatchQueue.main.async {
-                    //     PopUpHelper.showPopUp(
-                    //         message: "🎵 Using Spotify Original",
-                    //         buttonText: "OK"
-                    //     )
-                    // }
-                    
-                    // Complete the request
+                if url.isPremiumPlanRow {
+                    respondWithCustomData(
+                        try getPremiumPlanRowData(
+                            originalPremiumPlanRow: try PremiumPlanRow(serializedBytes: buffer)
+                        ),
+                        task: task,
+                        session: session
+                    )
                     orig.URLSession(session, task: task, didCompleteWithError: nil)
-                } else {
-                    // Show popup indicating fallback to original - DISABLED FOR PRODUCTION
-                    // DispatchQueue.main.async {
-                    //     PopUpHelper.showPopUp(
-                    //         message: "🎵 Using Spotify Original",
-                    //         buttonText: "OK"
-                    //     )
-                    // }
-                    
-                    // Complete the request
-                    orig.URLSession(session, task: task, didCompleteWithError: nil)
+                    return
                 }
-                return
-            }
-            
-            if url.isPremiumPlanRow {
-                respondWithCustomData(
-                    try getPremiumPlanRowData(
-                        originalPremiumPlanRow: try PremiumPlanRow(serializedBytes: buffer)
-                    ),
-                    task: task,
-                    session: session
-                )
-                orig.URLSession(session, task: task, didCompleteWithError: nil)
-                return
-            }
-            
-            if url.isPremiumBadge {
-                respondWithCustomData(try getPremiumPlanBadge(), task: task, session: session)
-                orig.URLSession(session, task: task, didCompleteWithError: nil)
-                return
-            }
-            
-            if url.isCustomize {
-                var customizeMessage = try CustomizeMessage(serializedBytes: buffer)
-                modifyRemoteConfiguration(&customizeMessage.response)
-                let modifiedData = try customizeMessage.serializedData()
-                SPTDataLoaderServiceHook.cachedCustomizeData = modifiedData
-                respondWithCustomData(modifiedData, task: task, session: session)
-                orig.URLSession(session, task: task, didCompleteWithError: nil)
-                return
-            }
-            
-            if url.isPlanOverview {
-                respondWithCustomData(try getPlanOverviewData(), task: task, session: session)
-                orig.URLSession(session, task: task, didCompleteWithError: nil)
-                return
+                
+                if url.isPremiumBadge {
+                    respondWithCustomData(try getPremiumPlanBadge(), task: task, session: session)
+                    orig.URLSession(session, task: task, didCompleteWithError: nil)
+                    return
+                }
+                
+                if url.isCustomize {
+                    var customizeMessage = try CustomizeMessage(serializedBytes: buffer)
+                    modifyRemoteConfiguration(&customizeMessage.response)
+                    let modifiedData = try customizeMessage.serializedData()
+                    SPTDataLoaderServiceHook.cachedCustomizeData = modifiedData
+                    respondWithCustomData(modifiedData, task: task, session: session)
+                    orig.URLSession(session, task: task, didCompleteWithError: nil)
+                    return
+                }
+                
+                if url.isPlanOverview {
+                    respondWithCustomData(try getPlanOverviewData(), task: task, session: session)
+                    orig.URLSession(session, task: task, didCompleteWithError: nil)
+                    return
+                }
             }
         }
         catch {
             orig.URLSession(session, task: task, didCompleteWithError: error)
+            return
         }
+        
+        orig.URLSession(session, task: task, didCompleteWithError: error)
     }
     func URLSession(
         _ session: URLSession,
