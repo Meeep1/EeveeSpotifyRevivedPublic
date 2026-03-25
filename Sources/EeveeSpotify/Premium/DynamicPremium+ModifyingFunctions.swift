@@ -148,4 +148,17 @@ private func modifyAttributes(_ attributes: inout [String: AccountAttribute]) {
 
     attributes.removeValue(forKey: "payment-state")
     attributes.removeValue(forKey: "last-premium-activation-date")
+    
+    // Modern logout prevention (Spotify 9.1.22+)
+    // Removing these forces the app to rely on the static premium attributes we set
+    // and prevents it from performing "Smart Shuffle" or "Trial" validation logic
+    // that often triggers a background logout.
+    attributes.removeValue(forKey: "on-demand-trial")
+    attributes.removeValue(forKey: "on-demand-trial-in-progress")
+    attributes.removeValue(forKey: "smart-shuffle")
+    
+    // Additional keys that can trigger backend validation mismatches
+    attributes.removeValue(forKey: "at-signal")
+    attributes.removeValue(forKey: "feature-set-id-masked")
+    attributes.removeValue(forKey: "strider-key")
 }
