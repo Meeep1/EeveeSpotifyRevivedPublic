@@ -2,13 +2,6 @@ name: Build Rootless Deb
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - 'Sources/**'
-      - 'Makefile'
-      - 'Tweak.x'
 
 env:
   THEOS: ${{ github.workspace }}/theos
