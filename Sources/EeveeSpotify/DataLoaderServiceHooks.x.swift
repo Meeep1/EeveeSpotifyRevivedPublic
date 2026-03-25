@@ -1,6 +1,9 @@
 import Foundation
 import Orion
 
+// Restore the global access token variable
+public var spotifyAccessToken: String?
+
 class SPTDataLoaderServiceHook: ClassHook<NSObject>, SpotifySessionDelegate {
     static let targetName = "SPTDataLoaderService"
     // orion:new
