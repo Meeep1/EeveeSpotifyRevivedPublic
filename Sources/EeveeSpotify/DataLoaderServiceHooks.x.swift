@@ -19,9 +19,22 @@ class SPTDataLoaderServiceHook: ClassHook<NSObject>, SpotifySessionDelegate {
 
     // orion:new
     func shouldBlock(_ url: URL) -> Bool {
-        return url.isDeleteToken || url.isAccountValidate || url.isOndemandSelector
-            || url.isTrialsFacade || url.isPremiumMarketing || url.isPendragonFetchMessageList
-            || url.isSessionInvalidation || url.isPushkaTokens
+        let elapsed = Date().timeIntervalSince(tweakInitTime)
+        
+        // Always block explicit session destroy/token delete
+        if url.isDeleteToken || url.isSessionInvalidation || url.path.contains("session/purge") || url.path.contains("token/revoke") {
+            return true
+        }
+
+        // Only block these after startup (30s) to allow initial login/initialization
+        if elapsed > 30 {
+            return url.isAccountValidate || url.isOndemandSelector
+                || url.isTrialsFacade || url.isPremiumMarketing || url.isPendragonFetchMessageList
+                || url.isPushkaTokens || url.path.contains("signup/public") || url.path.contains("apresolve")
+                || url.path.contains("pses/screenconfig") || url.path.contains("bootstrap/v1/bootstrap")
+        }
+        
+        return false
     }
 
     // orion:new
@@ -60,8 +73,17 @@ class SPTDataLoaderServiceHook: ClassHook<NSObject>, SpotifySessionDelegate {
             respondWithCustomData(Data(), task: task, session: session)
         } else if url.isPushkaTokens {
             respondWithCustomData(Data(), task: task, session: session)
-        } else if url.isSessionInvalidation {
-            respondWithCustomData(Data(), task: task, session: session)
+        } else if url.isSessionInvalidation || url.path.contains("session/purge") || url.path.contains("token/revoke") {
+            // Return synthetic OK to prevent internal logout triggers
+            respondWithCustomData("{\"status\":\"OK\"}".data(using: .utf8)!, task: task, session: session)
+        } else if url.path.contains("signup/public") {
+            respondWithCustomData("{\"status\":\"OK\"}".data(using: .utf8)!, task: task, session: session)
+        } else if url.path.contains("apresolve") {
+            respondWithCustomData("{\"status\":\"OK\"}".data(using: .utf8)!, task: task, session: session)
+        } else if url.path.contains("pses/screenconfig") {
+            respondWithCustomData("{}".data(using: .utf8)!, task: task, session: session)
+        } else if url.path.contains("bootstrap/v1/bootstrap") {
+            respondWithCustomData("{}".data(using: .utf8)!, task: task, session: session)
         }
         orig.URLSession(session, task: task, didCompleteWithError: nil)
     }
