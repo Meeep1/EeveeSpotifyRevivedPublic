@@ -32,7 +32,7 @@ private let propertyReplacements = [
     EeveePropertyReplacement(name: "is_remove_from_queue_enabled_for_mft_plus", modification: .remove),
     EeveePropertyReplacement(name: "is_reordering_for_mft_plus_allowed", modification: .remove),
     
-    // NEW: Aggressively disable ad-related feature flags
+    // NEW: Even more aggressive ad-related feature flags
     EeveePropertyReplacement(name: "enable_ads_in_search", modification: .setBool(false)),
     EeveePropertyReplacement(name: "enable_sponsored_playlist", modification: .setBool(false)),
     EeveePropertyReplacement(name: "enable_sponsored_context", modification: .setBool(false)),
@@ -40,6 +40,13 @@ private let propertyReplacements = [
     EeveePropertyReplacement(name: "enable_audio_ads", modification: .setBool(false)),
     EeveePropertyReplacement(name: "enable_in_app_messaging", modification: .setBool(false)),
     EeveePropertyReplacement(name: "enable_premium_upsells", modification: .setBool(false)),
+    EeveePropertyReplacement(name: "enable_sponsored_recommendations", modification: .setBool(false)),
+    EeveePropertyReplacement(name: "enable_merch_in_search", modification: .setBool(false)),
+    EeveePropertyReplacement(name: "enable_promoted_content", modification: .setBool(false)),
+    EeveePropertyReplacement(name: "enable_audio_ad_delivery", modification: .setBool(false)),
+    EeveePropertyReplacement(name: "enable_video_ad_delivery", modification: .setBool(false)),
+    EeveePropertyReplacement(name: "enable_hpt_sponsored_content", modification: .setBool(false)),
+    EeveePropertyReplacement(name: "enable_search_sponsored_content", modification: .setBool(false)),
     
     // 😡😡😡 spotify, stop changing the scroll logic
     EeveePropertyReplacement(name: "should_nova_scroll_use_scrollsita", modification: .remove)
@@ -139,9 +146,6 @@ private func modifyAttributes(_ attributes: inout [String: AccountAttribute]) {
     attributes.removeValue(forKey: "last-premium-activation-date")
     
     // Modern logout prevention (Spotify 9.1.22+)
-    // Removing these forces the app to rely on the static premium attributes we set
-    // and prevents it from performing "Smart Shuffle" or "Trial" validation logic
-    // that often triggers a background logout.
     attributes.removeValue(forKey: "on-demand-trial")
     attributes.removeValue(forKey: "on-demand-trial-in-progress")
     attributes.removeValue(forKey: "smart-shuffle")
