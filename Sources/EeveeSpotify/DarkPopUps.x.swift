@@ -1,7 +1,9 @@
 import Orion
 import UIKit
 import SwiftUI
+
 struct DarkPopUps: HookGroup { }
+
 private var popUpContainerViewController: String {
     // For 9.1.x, use dummy UIView to avoid crashes
     if EeveeSpotify.hookTarget == .v91 {
@@ -13,12 +15,14 @@ private var popUpContainerViewController: String {
     default: return "SPTEncorePopUpContainer" // Use older class for compatibility
     }
 }
+
 class EncoreLabelHook: ClassHook<UIView> {
     typealias Group = DarkPopUps
     
     static var targetName: String {
         return EeveeSpotify.hookTarget == .v91 ? "UIView" : "SPTEncoreLabel"
     }
+    
     func intrinsicContentSize() -> CGSize {
         if let viewController = WindowHelper.shared.viewController(for: target),
             NSStringFromClass(type(of: viewController)) == popUpContainerViewController
@@ -31,6 +35,7 @@ class EncoreLabelHook: ClassHook<UIView> {
         return orig.intrinsicContentSize()
     }
 }
+
 class SPTEncorePopUpContainerHook: ClassHook<UIViewController> {
     typealias Group = DarkPopUps
     static var targetName: String {
@@ -47,28 +52,26 @@ class SPTEncorePopUpContainerHook: ClassHook<UIViewController> {
         let dialogView = containedView().uiView()
         dialogView.backgroundColor = UIColor(Color(hex: "#242424"))
         
-        // Attempt to identify if this is a Premium upsell/ad popup
-        // If it is, we dismiss it immediately
-        if let titleLabel = findLabel(in: dialogView), 
-           let text = titleLabel.text?.lowercased(),
-           (text.contains("premium") || text.contains("ad-free") || text.contains("upgrade")) {
-            
-            // Dismiss the view controller silently
+        // Aggressive Premium popup detection and dismissal
+        if hasAdKeywords(in: dialogView) {
             target.dismiss(animated: false, completion: nil)
         }
     }
     
-    // Helper to find labels in the view hierarchy
     // orion:new
-    private func findLabel(in view: UIView) -> UILabel? {
-        if let label = view as? UILabel {
-            return label
-        }
-        for subview in view.subviews {
-            if let found = findLabel(in: subview) {
-                return found
+    private func hasAdKeywords(in view: UIView) -> Bool {
+        let keywords = ["premium", "ad-free", "upgrade", "subscribe", "offer", "try free", "plan", "get 3 months"]
+        
+        if let label = view as? UILabel, let text = label.text?.lowercased() {
+            for keyword in keywords {
+                if text.contains(keyword) { return true }
             }
         }
-        return nil
+        
+        for subview in view.subviews {
+            if hasAdKeywords(in: subview) { return true }
+        }
+        
+        return false
     }
 }
