@@ -1,28 +1,22 @@
-TARGET := iphone:clang:latest:14.0
-INSTALL_TARGET_PROCESSES = Spotify
-ARCHS = arm64
-
-include $(THEOS)/makefiles/common.mk
+export TARGET = iphone:clang:latest:14.0
+export ARCHS = arm64 arm64e
 
 TWEAK_NAME = EeveeSpotify
+EeveeSpotify_FILES = Sources/EeveeSpotify/Tweak.x.swift \
+                    Sources/EeveeSpotify/DataLoaderServiceHooks.x.swift \
+                    Sources/EeveeSpotify/DarkPopUps.x.swift \
+                    Sources/EeveeSpotify/SearchAdsHooks.x.swift \
+                    Sources/EeveeSpotify/SessionProtection.x.swift \
+                    Sources/EeveeSpotify/OpenSpotify.x.swift \
+                    $(shell find Sources/EeveeSpotify/Premium -name "*.swift") \
+                    $(shell find Sources/EeveeSpotify/Lyrics -name "*.swift") \
+                    $(shell find Sources/EeveeSpotify/Settings -name "*.swift") \
+                    $(shell find Sources/EeveeSpotify/Shared -name "*.swift") \
+                    $(shell find Sources/EeveeSpotify/Experiments -name "*.swift") \
+                    $(shell find Sources/EeveeSpotify/Dependencies -name "*.swift")
 
-EeveeSpotify_FILES = $(shell find Sources/EeveeSpotify -name '*.swift') $(shell find Sources/EeveeSpotifyC -name '*.m' -o -name '*.c' -o -name '*.mm' -o -name '*.cpp')
-EeveeSpotify_SWIFTFLAGS = -ISources/EeveeSpotifyC/include -Osize
-EeveeSpotify_EXTRA_FRAMEWORKS = SwiftProtobuf
-EeveeSpotify_CFLAGS = -fobjc-arc -ISources/EeveeSpotifyC/include -Os
+EeveeSpotify_SWIFTFLAGS = -ISources/EeveeSpotifyC/include
+EeveeSpotify_FRAMEWORKS = UIKit Foundation SwiftUI
 
+include $(THEOS)/makefiles/common.mk
 include $(THEOS_MAKE_PATH)/tweak.mk
-
-internal-stage::
-	# Bundle SwiftProtobuf.framework directly into the package
-	# This allows the DEB to work without external SwiftProtobuf installation
-	mkdir -p $(THEOS_STAGING_DIR)/Library/Frameworks
-	cp -r $(THEOS)/lib/iphone/rootless/SwiftProtobuf.framework $(THEOS_STAGING_DIR)/Library/Frameworks/
-
-# Legacy build step (no longer needed, kept for reference)
-copy-swiftprotobuf:
-	mkdir -p swiftprotobuf && cd swiftprotobuf ;\
-	curl -OL https://github.com/whoeevee/EeveeSpotify/releases/download/swift2.0/org.swift.protobuf.swiftprotobuf_1.26.0_iphoneos-arm.deb ;\
-	ar -x org.swift.protobuf.swiftprotobuf_1.26.0_iphoneos-arm.deb ;\
-	tar -xvf data.tar.lzma ;\
-	cp -r Library/Frameworks/SwiftProtobuf.framework "${THEOS}/lib" ;\

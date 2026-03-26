@@ -22,18 +22,16 @@ class EncoreLabelHook: ClassHook<UIView> {
     static var targetName: String {
         return EeveeSpotify.hookTarget == .v91 ? "UIView" : "SPTEncoreLabel"
     }
-
+    
     func intrinsicContentSize() -> CGSize {
         if let viewController = WindowHelper.shared.viewController(for: target),
             NSStringFromClass(type(of: viewController)) == popUpContainerViewController
         {
             let label = Dynamic.convert(target.subviews.first!, to: UILabel.self)
-
             if !label.hasParent(matching: "Primary") {
                 label.textColor = .white
             }
         }
-
         return orig.intrinsicContentSize()
     }
 }
@@ -50,6 +48,30 @@ class SPTEncorePopUpContainerHook: ClassHook<UIViewController> {
     
     func viewDidAppear(_ animated: Bool) {
         orig.viewDidAppear(animated)
-        containedView().uiView().backgroundColor = UIColor(Color(hex: "#242424"))
+        
+        let dialogView = containedView().uiView()
+        dialogView.backgroundColor = UIColor(Color(hex: "#242424"))
+        
+        // Aggressive Premium popup detection and dismissal
+        if hasAdKeywords(in: dialogView) {
+            target.dismiss(animated: false, completion: nil)
+        }
+    }
+    
+    // orion:new
+    private func hasAdKeywords(in view: UIView) -> Bool {
+        let keywords = ["premium", "ad-free", "upgrade", "subscribe", "offer", "try free", "plan", "get 3 months"]
+        
+        if let label = view as? UILabel, let text = label.text?.lowercased() {
+            for keyword in keywords {
+                if text.contains(keyword) { return true }
+            }
+        }
+        
+        for subview in view.subviews {
+            if hasAdKeywords(in: subview) { return true }
+        }
+        
+        return false
     }
 }
