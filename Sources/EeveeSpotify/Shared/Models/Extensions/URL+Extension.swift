@@ -58,11 +58,66 @@ extension URL {
         (self.path.contains("license") && self.path.contains("check"))
     }
 
-    // Additional Ad-blocking matchers
+    // NEW: Comprehensive Ad Detection
     var isAdLogic: Bool {
-        self.path.contains("ad-logic") || 
-        self.path.contains("ads/v") || 
-        self.path.contains("sponsored") ||
-        self.path.contains("in-app-messaging")
+        let adPaths = [
+            "ad-logic",
+            "ads/v",
+            "sponsored",
+            "in-app-messaging",
+            "merchandising",
+            "v1/merch",
+            "v1/ad",
+            "v2/ad",
+            "v1/ads",
+            "v2/ads",
+            "v1/sponsored",
+            "v2/sponsored",
+            "npv-video-ads",
+            "audio-ads",
+            "video-ads",
+            "banner-ads",
+            "promoted",
+            "upsell",
+            "premium-upsell"
+        ]
+        
+        let adHosts = [
+            "ads-fa.spotify.com",
+            "audio-ak.cdn.spotify.com",
+            "video-ak.cdn.spotify.com",
+            "pixel.spotify.com",
+            "merch-img.scdn.co",
+            "ad.doubleclick.net",
+            "googleads.g.doubleclick.net",
+            "pagead2.googlesyndication.com",
+            "tpc.googlesyndication.com",
+            "adservice.google.com",
+            "securepubads.g.doubleclick.net"
+        ]
+        
+        let pathLower = self.path.lowercased()
+        let hostLower = self.host?.lowercased() ?? ""
+        
+        for p in adPaths {
+            if pathLower.contains(p) { return true }
+        }
+        
+        for h in adHosts {
+            if hostLower.contains(h) { return true }
+        }
+        
+        // Check query parameters for ad-related flags
+        if let components = URLComponents(url: self, resolvingAgainstBaseURL: false),
+           let queryItems = components.queryItems {
+            for item in queryItems {
+                let name = item.name.lowercased()
+                if name.contains("ad_id") || name.contains("ad-id") || name.contains("sponsored") {
+                    return true
+                }
+            }
+        }
+        
+        return false
     }
 }
