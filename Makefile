@@ -1,3 +1,6 @@
+export TARGET = iphone:clang:latest:14.0
+export ARCHS = arm64 arm64e
+
 TWEAK_NAME = EeveeSpotify
 EeveeSpotify_FILES = Sources/EeveeSpotify/Tweak.x.swift \
                     Sources/EeveeSpotify/DataLoaderServiceHooks.x.swift \
