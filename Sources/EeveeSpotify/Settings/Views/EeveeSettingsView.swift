@@ -91,13 +91,13 @@ struct EeveeSettingsView: View {
             
             //
             
-            Section(header: Text("debug_title".localized), footer: Text("debug_section_footer".localized)) {
+            Section(header: Text("Debug"), footer: Text("Export or clear the debug log.")) {
                 Button {
                     let logPath = NSTemporaryDirectory() + "eeveespotify_debug.log"
                     guard FileManager.default.fileExists(atPath: logPath),
                           let logData = FileManager.default.contents(atPath: logPath),
                           logData.count > 0 else {
-                        PopUpHelper.showPopUp(message: "no_debug_log_found".localized, buttonText: "no_debug_log_found_ok".localized)
+                        PopUpHelper.showPopUp(message: "No debug log found. The log starts recording when the app launches.", buttonText: "OK")
                         return
                     }
                     let logURL = URL(fileURLWithPath: logPath)
@@ -115,7 +115,7 @@ struct EeveeSettingsView: View {
                 } label: {
                     HStack {
                         Image(systemName: "square.and.arrow.up")
-                        Text("export_debug_log".localized)
+                        Text("Export Debug Log")
                     }
                 }
                 
@@ -123,11 +123,11 @@ struct EeveeSettingsView: View {
                     let logPath = NSTemporaryDirectory() + "eeveespotify_debug.log"
                     try? "".write(toFile: logPath, atomically: true, encoding: .utf8)
                     writeDebugLog("Log cleared by user")
-                    PopUpHelper.showPopUp(message: "debug_log_cleared".localized, buttonText: "debug_log_cleared_ok".localized)
+                    PopUpHelper.showPopUp(message: "Debug log cleared.", buttonText: "OK")
                 } label: {
                     HStack {
                         Image(systemName: "trash")
-                        Text("clear_debug_log".localized)
+                        Text("Clear Debug Log")
                     }
                     .foregroundColor(.red)
                 }
