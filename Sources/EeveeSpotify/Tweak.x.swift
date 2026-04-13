@@ -51,6 +51,8 @@ struct IOS14And15PremiumPatchingGroup: HookGroup { }
 struct V91PremiumPatchingGroup: HookGroup { } // For Spotify 9.1.x versions
 struct LatestPremiumPatchingGroup: HookGroup { }
 
+struct DACAdBlockerGroup: HookGroup { }
+
 func activatePremiumPatchingGroup() {
     BasePremiumPatchingGroup().activate()
     
@@ -68,6 +70,7 @@ func activatePremiumPatchingGroup() {
         }
     }
     else {
+        // For other versions, activate all features normally
         NonIOS14PremiumPatchingGroup().activate()
         
         if EeveeSpotify.hookTarget == .lastAvailableiOS15 {
@@ -143,6 +146,9 @@ struct EeveeSpotify: Tweak {
         // For 9.1.x, activate premium patching and lyrics
         if EeveeSpotify.hookTarget == .v91 {
             
+            // Always activate ad blocking regardless of patch type
+            AdBlockerGroup().activate()
+            
             // Premium patching
             if UserDefaults.patchType.isPatching {
                 BasePremiumPatchingGroup().activate()
@@ -153,54 +159,12 @@ struct EeveeSpotify: Tweak {
             if lyricsEnabled {
                 BaseLyricsGroup().activate()
                 V91LyricsGroup().activate()
-
-            } else {
-
             }
             
             // Settings integration
             UniversalSettingsIntegrationGroup().activate()
-            // Also activate the banner for 9.1.x to ensure visibility if menu is missing
-            // V91SettingsIntegrationGroup().activate()
             
             NSLog("[EeveeSpotify] Initialization complete for 9.1.x")
-            
-            // Show startup popup with status - DISABLED FOR PRODUCTION
-            // DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-            //     let lyricsStatus = lyricsEnabled ? "✅ ENABLED (\(UserDefaults.lyricsSource.rawValue))" : "❌ DISABLED"
-            //     let sourceName = UserDefaults.lyricsSource.description
-            //     let message = """
-            //     EeveeSpotify \(EeveeSpotify.version)
-            //     Spotify 9.1.x EXPERIMENTAL
-            //     
-            //     📝 Lyrics: \(lyricsStatus)
-            //     Source: \(sourceName)
-            //     
-            //     🔍 Tap 'Start' to capture network requests.
-            //     
-            //     After ~15 requests you'll see if 9.1.6 makes lyrics network calls.
-            //     
-            //     NOTE: If lyrics button is missing, try switching to Musixmatch or Genius in Settings.
-            //     """
-            //     
-            //     PopUpHelper.showPopUp(
-            //         message: message,
-            //         buttonText: "Start Debug",
-            //         secondButtonText: "Skip",
-            //         onPrimaryClick: {
-            //             // Start capturing URLs
-            //             DataLoaderServiceHooks_startCapturing()
-            //             
-            //             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            //                 PopUpHelper.showPopUp(
-            //                     message: "🔍 Capturing started!\n\nNow open ANY song and tap lyrics.\n\nWait ~15 seconds for results.",
-            //                     buttonText: "OK"
-            //                 )
-            //             }
-            //         }
-            //     )
-            // }
-            
             return
         }
         
@@ -212,6 +176,9 @@ struct EeveeSpotify: Tweak {
         if UserDefaults.darkPopUps {
             DarkPopUps().activate()
         }
+        
+        // Always activate ad blocking regardless of patch type
+        AdBlockerGroup().activate()
         
         if UserDefaults.patchType.isPatching {
             activatePremiumPatchingGroup()
