@@ -5,46 +5,38 @@ private let likedTracksRow: [String: Any] = [
     "text": [ "title": "liked_songs".localized ]
 ]
 
-class HUBViewModelBuilderImplementationHook: ClassHook<NSObject> {
-    typealias Group = BasePremiumPatchingGroup
-    static let targetName: String = "HUBViewModelBuilderImplementation"
+// MARK: - Hubs Mutation Helper
+
+func mutateHubsJSON(_ dictionary: [String: Any]) -> [String: Any] {
+    var mutableDictionary = dictionary
     
-    func addJSONDictionary(_ dictionary: NSDictionary?) {
-        guard let dictionary = dictionary else {
-            return
+    let id = dictionary["id"] as? String
+    
+    if id == "artist-entity-view" {
+        guard var components = dictionary["body"] as? [[String: Any]] else {
+            return dictionary
         }
         
-        let mutableDictionary = NSMutableDictionary(dictionary: dictionary)
-        
-        let id = dictionary["id"] as? String
-        
-        if id == "artist-entity-view" {
-            guard var components = dictionary["body"] as? [[String: Any]] else {
-                orig.addJSONDictionary(dictionary)
-                return
+        if let index = components.firstIndex(
+            where: { $0["id"] as? String == "artist-entity-view-artist-tab-container" }
+        ) {
+            if var childrenArray = components[index]["children"] as? [[String: Any]],
+               var innerChildrenArray = childrenArray[0]["children"] as? [Any] {
+                
+                innerChildrenArray.insert(likedTracksRow, at: 0)
+                
+                childrenArray[0]["children"] = innerChildrenArray
+                components[index]["children"] = childrenArray
             }
-            
-            if let index = components.firstIndex(
-                where: { $0["id"] as? String == "artist-entity-view-artist-tab-container" }
-            ) {
-                if var childrenArray = components[index]["children"] as? [[String: Any]],
-                   var innerChildrenArray = childrenArray[0]["children"] as? [Any] {
-                    
-                    innerChildrenArray.insert(likedTracksRow, at: 0)
-                    
-                    childrenArray[0]["children"] = innerChildrenArray
-                    components[index]["children"] = childrenArray
-                }
-            }
-            else if let index = components.firstIndex(
-                where: { $0["id"] as? String == "artist-entity-view-top-tracks-combined" }
-            ) {
-                components.insert(likedTracksRow, at: index)
-            }
-            
-            mutableDictionary["body"] = components
+        }
+        else if let index = components.firstIndex(
+            where: { $0["id"] as? String == "artist-entity-view-top-tracks-combined" }
+        ) {
+            components.insert(likedTracksRow, at: index)
         }
         
-        orig.addJSONDictionary(mutableDictionary)
+        mutableDictionary["body"] = components
     }
+    
+    return mutableDictionary
 }
