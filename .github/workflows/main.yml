@@ -1,0 +1,57 @@
+name: Build Rootless Deb
+
+on:
+  workflow_dispatch:
+
+env:
+  THEOS: ${{ github.workspace }}/theos
+  SWIFTPROTOBUF_VERSION: "1.29.0"
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '16.2.0'
+
+      - name: Setup Theos
+        uses: actions/checkout@v4
+        with:
+          repository: theos/theos
+          path: ${{ github.workspace }}/theos
+          submodules: recursive
+
+      - name: Install Dependencies
+        run: |
+          brew install make dpkg ldid
+          # Ensure we use GNU Make
+          echo "$(brew --prefix make)/libexec/gnubin" >> $GITHUB_PATH
+
+      - name: Setup SwiftProtobuf (Rootless)
+        run: |
+          mkdir -p swiftprotobuf-rootless && cd swiftprotobuf-rootless
+          wget https://github.com/whoeevee/swift-protobuf/releases/download/${{ env.SWIFTPROTOBUF_VERSION }}/org.swift.protobuf.swiftprotobuf_${{ env.SWIFTPROTOBUF_VERSION }}_iphoneos-arm64.deb
+          ar -x org.swift.protobuf.swiftprotobuf_${{ env.SWIFTPROTOBUF_VERSION }}_iphoneos-arm64.deb
+          tar -xf data.tar.lzma
+          mkdir -p $THEOS/lib/iphone/rootless
+          cp -r var/jb/Library/Frameworks/SwiftProtobuf.framework $THEOS/lib/iphone/rootless/
+
+      - name: Build Rootless Package
+        run: |
+          make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
+          # Find the generated deb file
+          DEB_PATH=$(find packages -name "*.deb" | head -n 1)
+          echo "DEB_PATH=$DEB_PATH" >> $GITHUB_ENV
+          echo "DEB_NAME=$(basename $DEB_PATH)" >> $GITHUB_ENV
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.DEB_NAME }}
+          path: ${{ env.DEB_PATH }}
+          if-no-files-found: error
