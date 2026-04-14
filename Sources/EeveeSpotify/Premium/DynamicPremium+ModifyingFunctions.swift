@@ -2,14 +2,14 @@ import Foundation
 import UIKit
 
 func modifyRemoteConfiguration(_ configuration: inout UcsResponse) {
-    modifyAttributes(&configuration.attributes.accountAttributes)
-    
     if UserDefaults.overwriteConfiguration {
         configuration.resolve.configuration = try! BundleHelper.shared.resolveConfiguration()
     }
     else {
         modifyAssignedValues(&configuration.assignedValues)
     }
+    
+    modifyAttributes(&configuration.attributes.accountAttributes)
 }
 
 private let propertyReplacements = [
@@ -137,8 +137,6 @@ private let propertyReplacements = [
     EeveePropertyReplacement(name: "enable_sponsored_home_banners", modification: .setBool(false)),
     EeveePropertyReplacement(name: "enable_sponsored_now_playing", modification: .setBool(false)),
     EeveePropertyReplacement(name: "enable_sponsored_now_playing_banner", modification: .setBool(false)),
-    EeveePropertyReplacement(name: "enable_sponsored_now_playing_banners", modification: .setBool(false)),
-    EeveePropertyReplacement(name: "enable_sponsored_artist_banner", modification: .setBool(false)),
     EeveePropertyReplacement(name: "enable_sponsored_artist_banners", modification: .setBool(false)),
     EeveePropertyReplacement(name: "enable_sponsored_playlist_banner", modification: .setBool(false)),
     EeveePropertyReplacement(name: "enable_sponsored_playlist_banners", modification: .setBool(false)),
@@ -264,14 +262,6 @@ private let propertyReplacements = [
     EeveePropertyReplacement(name: "enable_display_element", modification: .setBool(false)),
     EeveePropertyReplacement(name: "enable_video_element", modification: .setBool(false)),
     EeveePropertyReplacement(name: "is_promo_cta_enabled", modification: .setBool(false)),
-    EeveePropertyReplacement(name: "show_time_cap_upsell_with_premium_badge", modification: .setBool(false)),
-    EeveePropertyReplacement(name: "enable_video_time_cap_upsell", modification: .setBool(false)),
-    EeveePropertyReplacement(name: "enable_video_time_cap_upsell_on_search", modification: .setBool(false)),
-    EeveePropertyReplacement(name: "music_video_upsell_enabled", modification: .setBool(false)),
-    EeveePropertyReplacement(name: "is_gbb_upsell_enabled", modification: .setBool(false)),
-    EeveePropertyReplacement(name: "should_show_pigeon_upsell", modification: .setBool(false)),
-    EeveePropertyReplacement(name: "disable_suggested_tracks_upsell", modification: .setBool(true)),
-    EeveePropertyReplacement(name: "is_enabled_pt2", modification: .setBool(false)),
     EeveePropertyReplacement(name: "show_skip_button_during_skippable_ads", modification: .setBool(true)),
     EeveePropertyReplacement(name: "sponsored_playlist_v2_header_dismissible", modification: .setBool(true)),
     EeveePropertyReplacement(name: "use_mock_sponsorship_endpoint", modification: .setBool(false)),
@@ -288,7 +278,6 @@ private let propertyReplacements = [
     EeveePropertyReplacement(name: "enable_home_page_ads", modification: .setBool(false)),
     EeveePropertyReplacement(name: "enable_billboard", modification: .setBool(false)),
     EeveePropertyReplacement(name: "enable_billboards", modification: .setBool(false)),
-    EeveePropertyReplacement(name: "enable_audio_ads_player", modification: .setBool(false)),
     EeveePropertyReplacement(name: "enable_display_ads_player", modification: .setBool(false)),
     EeveePropertyReplacement(name: "enable_video_ads_player", modification: .setBool(false)),
     EeveePropertyReplacement(name: "enable_audio_ads_player_v2", modification: .setBool(false)),
