@@ -26,12 +26,10 @@ struct EeveePatchingSettingsView: View {
             
             .onChange(of: patchType) { newPatchType in
                 UserDefaults.patchType = newPatchType
-                OfflineHelper.resetData()
             }
             
             .onChange(of: overwriteConfiguration) { overwriteConfiguration in
                 UserDefaults.overwriteConfiguration = overwriteConfiguration
-                OfflineHelper.resetData()
             }
             
             if patchType == .requests {
