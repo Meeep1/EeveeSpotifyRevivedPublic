@@ -1,7 +1,13 @@
-name: Build Rootless Deb
+name: Build Rootless Deb and inject .deb into IPA
 
 on:
   workflow_dispatch:
+    inputs:
+      ipa_url:
+        description: "URL to the decrypted IPA file (optional for IPA build)"
+        default: ""
+        required: false
+        type: string
 
 env:
   THEOS: ${{ github.workspace }}/theos
@@ -28,7 +34,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          brew install make dpkg ldid
+          brew install make dpkg ldid wget
           # Ensure we use GNU Make
           echo "$(brew --prefix make)/libexec/gnubin" >> $GITHUB_PATH
 
@@ -49,9 +55,79 @@ jobs:
           echo "DEB_PATH=$DEB_PATH" >> $GITHUB_ENV
           echo "DEB_NAME=$(basename $DEB_PATH)" >> $GITHUB_ENV
 
-      - name: Upload Artifact
+      - name: Upload DEB Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.DEB_NAME }}
           path: ${{ env.DEB_PATH }}
           if-no-files-found: error
+
+      - name: Build IPA (if IPA URL provided)
+        if: ${{ inputs.ipa_url != '' }}
+        run: |
+          # Download and Validate IPA
+          wget "${{ inputs.ipa_url }}" --no-verbose -O ${{ github.workspace }}/spotify.ipa
+          file_type=$(file --mime-type -b ${{ github.workspace }}/spotify.ipa)
+          if [[ "$file_type" != "application/x-ios-app" && "$file_type" != "application/zip" ]]; then
+            echo "::error::Validation failed: The downloaded file is not a valid IPA. Detected type: $file_type."
+            exit 1
+          fi
+
+      - name: Download SwiftProtobuf for IPA (if IPA URL provided)
+        if: ${{ inputs.ipa_url != '' }}
+        run: |
+          wget https://github.com/whoeevee/swift-protobuf/releases/download/${{ env.SWIFTPROTOBUF_VERSION }}/org.swift.protobuf.swiftprotobuf_${{ env.SWIFTPROTOBUF_VERSION }}_iphoneos-arm.deb
+          wget https://github.com/whoeevee/swift-protobuf/releases/download/${{ env.SWIFTPROTOBUF_VERSION }}/org.swift.protobuf.swiftprotobuf_${{ env.SWIFTPROTOBUF_VERSION }}_iphoneos-arm64.deb
+
+          echo "SWIFTPROTOBUF_ROOTFUL=org.swift.protobuf.swiftprotobuf_${{ env.SWIFTPROTOBUF_VERSION }}_iphoneos-arm.deb" >> $GITHUB_ENV
+          echo "SWIFTPROTOBUF_ROOTLESS=org.swift.protobuf.swiftprotobuf_${{ env.SWIFTPROTOBUF_VERSION }}_iphoneos-arm64.deb" >> $GITHUB_ENV
+
+      - name: Download OpenSpotifySafariExtension (if IPA URL provided)
+        if: ${{ inputs.ipa_url != '' }}
+        run: |
+          git clone https://github.com/BillyCurtis/OpenSpotifySafariExtension
+          echo "OPENSPOTIFYSAFARIEXTENSION=OpenSpotifySafariExtension/OpenSpotifySafariExtension.appex" >> $GITHUB_ENV
+
+      - name: Setup insert-dylib (if IPA URL provided)
+        if: ${{ inputs.ipa_url != '' }}
+        run: |
+          git clone https://github.com/Tyilo/insert_dylib.git
+          xcrun clang -x c -arch arm64 ./insert_dylib/insert_dylib/main.c -I/usr/include/ -o insert-dylib
+          sudo mv insert-dylib /usr/local/bin/
+          sudo chmod +x /usr/local/bin/insert-dylib
+
+      - name: Setup ivinject (if IPA URL provided)
+        if: ${{ inputs.ipa_url != '' }}
+        run: |
+          git clone https://github.com/whoeevee/ivinject.git
+          cp -r ./ivinject/KnownFrameworks ~/.ivinject
+          wget https://github.com/whoeevee/ivinject/releases/download/first/ivinject-arm64
+          sudo mv ivinject-arm64 /usr/local/bin/
+          sudo chmod +x /usr/local/bin/ivinject-arm64
+
+      - name: Remove Watch App from IPA (if IPA URL provided)
+        if: ${{ inputs.ipa_url != '' }}
+        run: |
+          unzip -q spotify.ipa -d spotify_temp
+          rm -rf spotify_temp/Payload/Spotify.app/Watch
+          rm -rf spotify_temp/Payload/Spotify.app/PlugIns/*.appex
+          cd spotify_temp
+          zip -qr ../spotify_clean.ipa Payload
+          cd ..
+          rm -rf spotify_temp
+          mv spotify_clean.ipa spotify.ipa
+
+      - name: Create EeveeSpotify IPA Package (if IPA URL provided)
+        if: ${{ inputs.ipa_url != '' }}
+        run: |
+          ivinject-arm64 spotify.ipa EeveeSpotify.ipa \
+            -i ${{ env.DEB_PATH }} "$OPENSPOTIFYSAFARIEXTENSION" \
+            -s - -d --level Optimal
+
+      - name: Upload IPA Artifact (if IPA URL provided)
+        if: ${{ inputs.ipa_url != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: EeveeSpotify.ipa
+          path: ${{ github.workspace }}/EeveeSpotify.ipa
+          if-no-files-found: warn
