@@ -3,6 +3,11 @@ name: Build Rootless Deb and inject .deb into IPA
 on:
   workflow_dispatch:
     inputs:
+      branch:
+        description: "Branch to build from"
+        default: "main"
+        required: true
+        type: string
       ipa_url:
         description: "URL to the decrypted IPA file (optional for IPA build)"
         default: ""
@@ -19,6 +24,9 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch }}
+          fetch-depth: 0
 
       - name: Setup Xcode
         uses: maxim-lobanov/setup-xcode@v1
