@@ -11,6 +11,12 @@ This tweak makes Spotify think you have a Premium subscription, granting free li
 > [!NOTE]
 > The original EeveeSpotify repository was disabled due to a [DMCA takedown](https://github.com/github/dmca/blob/master/2025/08/2025-08-14-spotify.md). This repository will not contain IPA packages in the repo itself.
 
+## Supported Version
+
+**Recommended Spotify version: 9.1.28**
+
+Newer Spotify 9.1.x builds may be unstable or unsupported. Please check [common_issues.md](common_issues.md) before opening an issue.
+
 ## Custom Lyrics Support
 
 **Spotify 9.1.28** - Full custom lyrics functionality is available with the following provider:
@@ -37,7 +43,7 @@ This tweak makes Spotify think you have a Premium subscription, granting free li
     <li><strong>NOTE:</strong> Make sure to provide a direct download link to the file, not a link to a webpage. Otherwise, the process will fail.</li>
     <li>Go to the releases page of the EeveeSpotify repository (<strong>NOT</strong> the fork). Hold and copy the link of the .deb file, which corresponds to your phone's architecture.</li>
     <li>Make sure all inputs are correct, then click <strong>Run workflow</strong> to start the process.</li>
-    <li>Wait for the build to finish. You can download the EeveeSpotify IPA from the releases section of your forked repo. (If you can't find the releases section, go to your forked repo and add /releases to the URL, i.e., github.com/user/EeveeSpotifyReborn/releases.)</li>
+    <li>Wait for the build to finish. You can download the EeveeSpotify IPA from the releases section of your forked repo. (If you can't find the releases section, go to your forked repo and add /releases to the URL, i.e., github.com/user/EeveeSpotifyRevivedPublic/releases.)</li>
   </ol>
 </details>
 

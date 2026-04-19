@@ -1,4 +1,4 @@
-# thanks to uYouEnhanced for the issue template:
+# thanks to uYouEnhanced for the original issue template inspiration:
 # https://github.com/arichornlover/uYouEnhanced/blob/main/.github/ISSUE_TEMPLATE/bug.yaml?plain=1
 
 name: Bug
@@ -6,32 +6,120 @@ description: Report a bug in EeveeSpotify
 title: "[Bug] "
 labels: bug
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Please fill out **all required fields**.
+
+        Before opening a new issue:
+        - Read the [common issues document](https://github.com/Meeep1/EeveeSpotifyRevivedPublic/blob/main/common_issues.md)
+        - Search existing issues for duplicates
+        - Include logs, screenshots, or screen recordings whenever possible
+
   - type: checkboxes
     attributes:
       label: Is this issue appropriate?
-      description: |
-        Please read the list of [common issues](https://github.com/whoeevee/EeveeSpotifyReborn/blob/swift/common_issues.md).
       options:
-        - label: I have read the document in its entirety
+        - label: I have read the common issues document
+          required: true
+        - label: I searched existing issues before opening this report
+          required: true
+        - label: I was unable to reproduce this issue in the stock Spotify app
           required: true
 
-  - type: checkboxes
+  - type: input
+    id: spotify-version
     attributes:
-      label: Is this issue unique to EeveeSpotify?
-      options:
-        - label: I was unable to reproduce my issue using the stock Spotify app
-          required: true
-
-  - type: checkboxes
-    attributes:
-      label: Have you searched the existing issues?
-      options:
-        - label: This is a unique issue
-          required: true
-
-  - type: textarea
-    attributes:
-      label: Describe the bug.
-      description: Attach videos or screenshots if possible
+      label: Spotify version
+      placeholder: e.g. 9.1.28
     validations:
       required: true
+
+  - type: input
+    id: eeveespotify-version
+    attributes:
+      label: EeveeSpotify version
+      placeholder: e.g. v6.6.2
+    validations:
+      required: true
+
+  - type: input
+    id: ios-version
+    attributes:
+      label: iOS version
+      placeholder: e.g. iOS 16.6.1
+    validations:
+      required: true
+
+  - type: dropdown
+    id: install-method
+    attributes:
+      label: Install method
+      options:
+        - TrollStore
+        - Sideloadly
+        - AltStore
+        - Jailbreak
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: login-method
+    attributes:
+      label: Login method
+      options:
+        - Username / Password
+        - Google
+        - Apple
+        - Facebook
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: Describe the bug
+      description: Explain what is happening. Attach videos or screenshots if possible.
+      placeholder: Tell us what happened and when it happens.
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro-steps
+    attributes:
+      label: Steps to reproduce
+      description: Provide exact steps so the bug can be reproduced.
+      placeholder: |
+        1. Open Spotify
+        2. Play any song
+        3. Lock the device
+        4. App logs out after 2 songs
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected behavior
+      placeholder: Describe what you expected to happen.
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs, screenshots, or crash reports
+      description: Paste logs or attach screenshots/screen recordings if available.
+      placeholder: Attach anything that may help debugging.
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Include anything else that may matter, such as VPN use, region changes, or whether the issue started after updating Spotify.
+    validations:
+      required: false
