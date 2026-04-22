@@ -9,6 +9,8 @@ func DataLoaderServiceHooks_startCapturing() {
 }
 
 class SPTDataLoaderServiceHook: ClassHook<NSObject>, SpotifySessionDelegate {
+    // Intercepts various responses (customize/plan/lyrics) and now also bootstrap for 9.1.x stability.
+    typealias Group = PremiumBootstrapGroup
     static let targetName = "SPTDataLoaderService"
 
     // orion:new
@@ -59,7 +61,7 @@ class SPTDataLoaderServiceHook: ClassHook<NSObject>, SpotifySessionDelegate {
 
     // orion:new
     func shouldModify(_ url: URL) -> Bool {
-        let shouldPatchPremium = BasePremiumPatchingGroup.isActive
+        let shouldPatchPremium = BasePremiumPatchingGroup.isActive || PremiumBootstrapGroup.isActive
         let shouldReplaceLyrics = BaseLyricsGroup.isActive
         
         let isLyricsURL = url.isLyrics
@@ -67,7 +69,7 @@ class SPTDataLoaderServiceHook: ClassHook<NSObject>, SpotifySessionDelegate {
         let isDAC = path.contains("/dac/view/v1/")
         
         return (shouldReplaceLyrics && isLyricsURL)
-            || (shouldPatchPremium && (url.isCustomize || url.isPremiumPlanRow || url.isPremiumBadge || url.isPlanOverview || isDAC))
+            || (shouldPatchPremium && (url.isBootstrap || url.isCustomize || url.isPremiumPlanRow || url.isPremiumBadge || url.isPlanOverview || isDAC))
     }
     
     // orion:new
@@ -218,6 +220,20 @@ class SPTDataLoaderServiceHook: ClassHook<NSObject>, SpotifySessionDelegate {
                 return
             }
             
+            if url.isBootstrap {
+                // Patch bootstrap on the SPTDataLoaderService path too.
+                // Some builds / sessions do not hit SpotifySessionDelegateBootstrapHook reliably.
+                var bootstrapMessage = try BootstrapMessage(serializedBytes: buffer)
+                writeDebugLog("[BOOTSTRAP] (DL) Patching bootstrap UCS response")
+                UserDefaults.hasPatchedBootstrap = true
+                if UserDefaults.patchType == .requests {
+                    modifyRemoteConfiguration(&bootstrapMessage.ucsResponse)
+                }
+                respondWithCustomData(try bootstrapMessage.serializedBytes(), task: task, session: session)
+                orig.URLSession(session, task: task, didCompleteWithError: nil)
+                return
+            }
+
             if url.isCustomize {
                 var customizeMessage = try CustomizeMessage(serializedBytes: buffer)
                 modifyRemoteConfiguration(&customizeMessage.response)

@@ -4,11 +4,13 @@ import UIKit
 func modifyRemoteConfiguration(_ configuration: inout UcsResponse) {
     modifyAttributes(&configuration.attributes.accountAttributes)
     
+    // IMPORTANT:
+    // Always apply our assignedValues patching. Some accounts receive different remote configs,
+    // and using a static bundled resolve config alone can regress back to Free tier.
+    modifyAssignedValues(&configuration.assignedValues)
+
     if UserDefaults.overwriteConfiguration {
         configuration.resolve.configuration = try! BundleHelper.shared.resolveConfiguration()
-    }
-    else {
-        modifyAssignedValues(&configuration.assignedValues)
     }
 }
 

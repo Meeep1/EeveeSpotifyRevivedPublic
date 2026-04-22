@@ -8,7 +8,13 @@ import Foundation
 // Additionally blocks network endpoints that trigger session invalidation.
 // Extends OAuth token expiry to prevent internal reauth triggers.
 
-struct SessionLogoutHookGroup: HookGroup { }
+// Split into smaller groups so missing selectors/classes don't crash on activation.
+// Spotify occasionally renames/removes private session-related selectors between minor versions.
+// By gating each group behind runtime checks, we keep compatibility across 9.1.x.
+struct SessionLogoutAuthHookGroup: HookGroup { }
+struct SessionLogoutConnectivityHookGroup: HookGroup { }
+struct SessionLogoutAblyHookGroup: HookGroup { }
+struct SessionLogoutNetworkHookGroup: HookGroup { }
 
 // Ably action name mapping for readable logs
 private let ablyActionNames: [Int: String] = [
@@ -21,7 +27,7 @@ private let ablyActionNames: [Int: String] = [
 // MARK: - SPTAuthSessionImplementation — Core Session Hooks
 
 class SPTAuthSessionHook: ClassHook<NSObject> {
-    typealias Group = SessionLogoutHookGroup
+    typealias Group = SessionLogoutAuthHookGroup
     static let targetName = "SPTAuthSessionImplementation"
 
     // orion:new
@@ -91,7 +97,7 @@ class SPTAuthSessionHook: ClassHook<NSObject> {
 // MARK: - SessionServiceImpl (Connectivity_SessionImpl module)
 
 class SessionServiceImplHook: ClassHook<NSObject> {
-    typealias Group = SessionLogoutHookGroup
+    typealias Group = SessionLogoutConnectivityHookGroup
     static let targetName = "_TtC24Connectivity_SessionImpl18SessionServiceImpl"
 
     func automatedLogoutThenLogin() {
@@ -126,7 +132,7 @@ class SessionServiceImplHook: ClassHook<NSObject> {
 // MARK: - SPTAuthLegacyLoginControllerImplementation
 
 class LegacyLoginControllerHook: ClassHook<NSObject> {
-    typealias Group = SessionLogoutHookGroup
+    typealias Group = SessionLogoutAuthHookGroup
     static let targetName = "SPTAuthLegacyLoginControllerImplementation"
 
     func sessionDidLogout(_ session: AnyObject, withReason reason: AnyObject) {
@@ -172,7 +178,7 @@ class LegacyLoginControllerHook: ClassHook<NSObject> {
 // the internal timer from marking the token as expired.
 
 class OauthAccessTokenBridgeHook: ClassHook<NSObject> {
-    typealias Group = SessionLogoutHookGroup
+    typealias Group = SessionLogoutConnectivityHookGroup
     static let targetName = "_TtC24Connectivity_SessionImplP33_831B98CC28223E431E21CD27ADD20AF222OauthAccessTokenBridge"
 
     // Hook the GETTER
@@ -245,7 +251,7 @@ private func extractAblyAction(_ text: String) -> Int? {
 }
 
 class ARTWebSocketTransportHook: ClassHook<NSObject> {
-    typealias Group = SessionLogoutHookGroup
+    typealias Group = SessionLogoutAblyHookGroup
     static let targetName = "ARTWebSocketTransport"
 
     func webSocket(_ ws: AnyObject, didReceiveMessage message: AnyObject) {
@@ -286,7 +292,7 @@ class ARTWebSocketTransportHook: ClassHook<NSObject> {
 // MARK: - Ably SRWebSocket Frame Hook
 
 class ARTSRWebSocketHook: ClassHook<NSObject> {
-    typealias Group = SessionLogoutHookGroup
+    typealias Group = SessionLogoutAblyHookGroup
     static let targetName = "ARTSRWebSocket"
 
     func _handleFrameWithData(_ data: NSData, opCode code: Int) {
@@ -321,7 +327,7 @@ class ARTSRWebSocketHook: ClassHook<NSObject> {
 // MARK: - Global URLSessionTask hook to catch auth traffic bypassing SPTDataLoaderService
 
 class URLSessionTaskResumeHook: ClassHook<NSObject> {
-    typealias Group = SessionLogoutHookGroup
+    typealias Group = SessionLogoutNetworkHookGroup
     static let targetName = "NSURLSessionTask"
 
     func resume() {
@@ -332,6 +338,17 @@ class URLSessionTaskResumeHook: ClassHook<NSObject> {
             let elapsed = Date().timeIntervalSince(tweakInitTime)
             let elapsedInt = Int(elapsed)
             let path = url.path
+
+            // If we've already patched bootstrap once in this session, block any subsequent
+            // bootstrap calls. Some 9.1.x builds perform a second bootstrap very early during
+            // an internal session re-init, and that second response can overwrite our premium state.
+            // Only cancel *subsequent* bootstrap calls in the same launch cycle.
+            // Never cancel the initial bootstrap during startup, or Spotify can hang on splash.
+            if path.contains("bootstrap/v1/bootstrap"), UserDefaults.hasPatchedBootstrap, elapsed > 5 {
+                writeDebugLog("[NET] Cancelled bootstrap re-fetch at \(elapsedInt)s")
+                task.cancel()
+                return
+            }
 
             // Log auth-related requests for diagnostics
             let isAuthRelated = host.contains("login5") ||

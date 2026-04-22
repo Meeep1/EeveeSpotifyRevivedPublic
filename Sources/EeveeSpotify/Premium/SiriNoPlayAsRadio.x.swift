@@ -2,7 +2,7 @@ import Orion
 import Intents
 
 class INMediaItemHook: ClassHook<INMediaItem> {
-    typealias Group = BasePremiumPatchingGroup
+    typealias Group = PremiumUIHooksGroup
     
     func identifier() -> String {
         var identifier = orig.identifier()

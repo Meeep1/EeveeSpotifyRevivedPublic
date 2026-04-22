@@ -11,6 +11,7 @@ extension UserDefaults {
     private static let lyricsColorsKey = "lyricsColors"
     private static let lyricsOptionsKey = "lyricsOptions"
     private static let hasShownCommonIssuesTipKey = "hasShownCommonIssuesTip"
+    private static let hasPatchedBootstrapKey = "eeveeHasPatchedBootstrap"
 
     static var musixmatchToken: String {
         get {
@@ -36,7 +37,9 @@ extension UserDefaults {
                 return EeveePatchType(rawValue: rawValue) ?? .requests
             }
 
-            return .notSet
+            // If the key is missing (fresh install / "reset data"), default to patching.
+            // This avoids users silently falling back to Free tier.
+            return .requests
         }
         set (patchType) {
             container.set(patchType.rawValue, forKey: patchTypeKey)
@@ -61,6 +64,11 @@ extension UserDefaults {
         }
     }
     
+    static var hasPatchedBootstrap: Bool {
+        get { container.bool(forKey: hasPatchedBootstrapKey) }
+        set { container.set(newValue, forKey: hasPatchedBootstrapKey) }
+    }
+
     static var hasShownCommonIssuesTip: Bool {
         get {
             container.bool(forKey: hasShownCommonIssuesTipKey)
