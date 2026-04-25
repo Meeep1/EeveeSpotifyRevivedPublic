@@ -387,17 +387,10 @@ class URLSessionTaskResumeHook: ClassHook<NSObject> {
                     task.cancel()
                     return
                 }
-                // Block periodic re-fetches of the customize endpoint.
-                // Spotify's RemoteConfigurationSDK AuthFetcher re-fetches the customize
-                // endpoint after minimumFetchIntervalSeconds (typically a few hours).
-                // This re-fetch can bypass the DataLoaderService hook if it uses a
-                // background URLSession, causing ads to reappear.
-                // We block re-fetches after the initial 30s startup window.
-                if elapsed > 30 && path.contains("v1/customize") {
-                    writeDebugLog("[NET] Cancelled customize re-fetch at \(elapsedInt)s")
-                    task.cancel()
-                    return
-                }
+                // Do NOT cancel customize re-fetches.
+                // On 9.1.40 some users appear to rely on periodic customize refresh
+                // to maintain correct account / feature state. We rely on response
+                // mutation in SPTDataLoaderServiceHook instead of cancellation.
                 if elapsed > 30 && host.contains("apresolve") {
                     writeDebugLog("[NET] Cancelled apresolve at \(elapsedInt)s")
                     task.cancel()
