@@ -144,12 +144,11 @@ extension URL {
     }
 
     // Additional session protection endpoints
+    // IMPORTANT: do NOT include `product-state` here.
+    // Some 9.1.40 sessions rely on product-state refresh/update for correct tier state.
     var isSessionInvalidation: Bool {
         self.path.contains("logout") || self.path.contains("sign-out") ||
         self.path.contains("session/purge") || self.path.contains("token/revoke") ||
-        self.path.contains("auth/expire") ||
-        (self.path.contains("melody") && self.path.contains("check")) ||
-        self.path.contains("product-state") ||
-        (self.path.contains("license") && self.path.contains("check"))
+        self.path.contains("auth/expire")
     }
 }
