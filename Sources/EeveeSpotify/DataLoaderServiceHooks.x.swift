@@ -44,9 +44,9 @@ class SPTDataLoaderServiceHook: ClassHook<NSObject>, SpotifySessionDelegate {
 
         // Only block these after startup (30s) to allow initial login/initialization
         if elapsed > 30 {
-            return url.isOndemandSelector
+            return url.isAccountValidate || url.isOndemandSelector
                 || url.isTrialsFacade || url.isPremiumMarketing || url.isPendragonFetchMessageList
-                || url.isPushkaTokens || url.path.contains("apresolve")
+                || url.isPushkaTokens || url.path.contains("signup/public") || url.path.contains("apresolve")
                 || url.path.contains("pses/screenconfig")
                 // Block periodic customize re-fetches (RemoteConfigurationSDK AuthFetcher).
                 // The AuthFetcher re-fetches v1/customize after minimumFetchIntervalSeconds
@@ -81,6 +81,9 @@ class SPTDataLoaderServiceHook: ClassHook<NSObject>, SpotifySessionDelegate {
     func handleBlockedEndpoint(_ url: URL, task: URLSessionDataTask, session: URLSession) {
         if url.isDeleteToken {
             respondWithCustomData(Data(), task: task, session: session)
+        } else if url.isAccountValidate {
+            let response = "{\"status\":1,\"country\":\"US\",\"is_country_launched\":true}".data(using: .utf8)!
+            respondWithCustomData(response, task: task, session: session)
         } else if url.isOndemandSelector {
             respondWithCustomData(Data(), task: task, session: session)
         } else if url.isTrialsFacade {
@@ -94,6 +97,8 @@ class SPTDataLoaderServiceHook: ClassHook<NSObject>, SpotifySessionDelegate {
             respondWithCustomData(Data(), task: task, session: session)
         } else if url.isSessionInvalidation || url.path.contains("session/purge") || url.path.contains("token/revoke") {
             // Return synthetic OK to prevent internal logout triggers
+            respondWithCustomData("{\"status\":\"OK\"}".data(using: .utf8)!, task: task, session: session)
+        } else if url.path.contains("signup/public") {
             respondWithCustomData("{\"status\":\"OK\"}".data(using: .utf8)!, task: task, session: session)
         } else if url.path.contains("apresolve") {
             respondWithCustomData("{\"status\":\"OK\"}".data(using: .utf8)!, task: task, session: session)
