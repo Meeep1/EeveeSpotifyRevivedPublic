@@ -48,12 +48,6 @@ class SPTDataLoaderServiceHook: ClassHook<NSObject>, SpotifySessionDelegate {
                 || url.isTrialsFacade || url.isPremiumMarketing || url.isPendragonFetchMessageList
                 || url.isPushkaTokens || url.path.contains("signup/public") || url.path.contains("apresolve")
                 || url.path.contains("pses/screenconfig")
-                // Block periodic customize re-fetches (RemoteConfigurationSDK AuthFetcher).
-                // The AuthFetcher re-fetches v1/customize after minimumFetchIntervalSeconds
-                // (typically a few hours). If this re-fetch is not intercepted and modified,
-                // the app re-enables ad feature flags from the server response.
-                // We block re-fetches here; the cached modified data is served via the 304 path.
-                || url.path.contains("v1/customize")
         }
         
         return false
