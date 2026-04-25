@@ -339,16 +339,9 @@ class URLSessionTaskResumeHook: ClassHook<NSObject> {
             let elapsedInt = Int(elapsed)
             let path = url.path
 
-            // If we've already patched bootstrap once in this session, block any subsequent
-            // bootstrap calls. Some 9.1.x builds perform a second bootstrap very early during
-            // an internal session re-init, and that second response can overwrite our premium state.
-            // Only cancel *subsequent* bootstrap calls in the same launch cycle.
-            // Never cancel the initial bootstrap during startup, or Spotify can hang on splash.
-            if path.contains("bootstrap/v1/bootstrap"), UserDefaults.hasPatchedBootstrap, elapsed > 5 {
-                writeDebugLog("[NET] Cancelled bootstrap re-fetch at \(elapsedInt)s")
-                task.cancel()
-                return
-            }
+            // NOTE: Do not cancel bootstrap re-fetches. Some users appear to require
+            // subsequent bootstrap calls to keep account state consistent in 9.1.40.
+            // We rely on the bootstrap response patching hooks instead.
 
             // Log auth-related requests for diagnostics
             let isAuthRelated = host.contains("login5") ||
@@ -389,8 +382,8 @@ class URLSessionTaskResumeHook: ClassHook<NSObject> {
                     task.cancel()
                     return
                 }
-                if elapsed > 30 && path.contains("bootstrap/v1/bootstrap") {
-                    writeDebugLog("[NET] Cancelled bootstrap re-fetch at \(elapsedInt)s")
+                if elapsed > 30 && path.contains("signup/public") {
+                    writeDebugLog("[NET] Cancelled signup/public at \(elapsedInt)s")
                     task.cancel()
                     return
                 }
