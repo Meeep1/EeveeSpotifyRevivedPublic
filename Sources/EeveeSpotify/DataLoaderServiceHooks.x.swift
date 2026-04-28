@@ -42,6 +42,12 @@ class SPTDataLoaderServiceHook: ClassHook<NSObject>, SpotifySessionDelegate {
             return true
         }
 
+        // Block product state fetch endpoints (9.1.34+ ConsentProductStateDataLoaderImpl)
+        // These endpoints re-fetch fresh product state from server which contains real free-tier data
+        if url.isProductStateFetch {
+            return true
+        }
+
         // Only block these after startup (30s) to allow initial login/initialization
         if elapsed > 30 {
             return url.isAccountValidate || url.isOndemandSelector
@@ -119,6 +125,10 @@ class SPTDataLoaderServiceHook: ClassHook<NSObject>, SpotifySessionDelegate {
             } else {
                 respondWithCustomData(Data(), task: task, session: session)
             }
+        } else if url.isProductStateFetch {
+            // Block product state re-fetches (9.1.34+ ConsentProductStateDataLoaderImpl)
+            // Return empty data to prevent fresh free-tier state from being applied
+            respondWithCustomData(Data(), task: task, session: session)
         }
         orig.URLSession(session, task: task, didCompleteWithError: nil)
     }

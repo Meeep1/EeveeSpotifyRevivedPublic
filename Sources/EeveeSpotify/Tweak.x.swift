@@ -56,6 +56,7 @@ struct IOS14PremiumPatchingGroup: HookGroup { }
 struct NonIOS14PremiumPatchingGroup: HookGroup { }
 struct IOS14And15PremiumPatchingGroup: HookGroup { }
 struct V91PremiumPatchingGroup: HookGroup { } // For Spotify 9.1.x versions
+struct ProductStatePatchingGroup: HookGroup { } // For 9.1.34+ product state hooks
 struct LatestPremiumPatchingGroup: HookGroup { }
 
 func activatePremiumPatchingGroup() {
@@ -286,6 +287,20 @@ struct EeveeSpotify: Tweak {
             if UserDefaults.patchType.isPatching {
                 PremiumBootstrapGroup().activate()
                 writeDebugLog("[INIT] Activated PremiumBootstrapGroup")
+
+                // Product state hooks for 9.1.34+ (ConsentProductStateDataLoaderImpl)
+                // These hooks prevent Spotify from re-fetching fresh free-tier product state
+                if let consentCls = NSClassFromString("_TtC26DeviceLocation_ConsentImpl33ConsentProductStateDataLoaderImpl") {
+                    let loadProductStateSel = Selector(("loadProductState"))
+                    if class_getInstanceMethod(consentCls, loadProductStateSel) != nil {
+                        ProductStatePatchingGroup().activate()
+                        writeDebugLog("[INIT] Activated ProductStatePatchingGroup")
+                    } else {
+                        writeDebugLog("[INIT] Skipped ProductStatePatchingGroup (loadProductState missing)")
+                    }
+                } else {
+                    writeDebugLog("[INIT] ConsentProductStateDataLoaderImpl not found (may not be 9.1.34+)")
+                }
 
                 // Optional UI hooks (safe-gated)
                 if let hub = NSClassFromString("HUBViewModelBuilderImplementation"),
