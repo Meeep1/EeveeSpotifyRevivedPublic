@@ -152,15 +152,4 @@ extension URL {
         self.path.contains("product-state") ||
         (self.path.contains("license") && self.path.contains("check"))
     }
-    
-    // ProductState related endpoints (for 9.1.34+ ConsentProductStateDataLoaderImpl)
-    var isProductStateFetch: Bool {
-        let path = self.path.lowercased()
-        return path.contains("consent/product-state") ||
-               path.contains("productstate/productstate") ||
-               path.contains("product-state/product-state") ||
-               path.contains("product_state/product_state") ||
-               path.contains("/product-state") ||
-               path.contains("/productstate")
-    }
 }
