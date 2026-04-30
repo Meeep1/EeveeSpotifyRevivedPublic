@@ -44,7 +44,7 @@ class SPTDataLoaderServiceHook: ClassHook<NSObject>, SpotifySessionDelegate {
 
         // Block product state fetch endpoints (9.1.34+ ConsentProductStateDataLoaderImpl)
         // These endpoints re-fetch fresh product state from server which contains real free-tier data
-        if url.isProductStateFetch {
+        if path.contains("consent/product-state") || path.contains("productstate") {
             return true
         }
 
@@ -125,7 +125,8 @@ class SPTDataLoaderServiceHook: ClassHook<NSObject>, SpotifySessionDelegate {
             } else {
                 respondWithCustomData(Data(), task: task, session: session)
             }
-        } else if url.isProductStateFetch {
+        } else if url.path.lowercased().contains("consent/product-state") ||
+                  url.path.lowercased().contains("productstate") {
             // Block product state re-fetches (9.1.34+ ConsentProductStateDataLoaderImpl)
             // Return empty data to prevent fresh free-tier state from being applied
             respondWithCustomData(Data(), task: task, session: session)
