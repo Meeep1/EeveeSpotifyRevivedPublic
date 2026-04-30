@@ -152,6 +152,15 @@ class SPTDataLoaderServiceHook: ClassHook<NSObject>, SpotifySessionDelegate {
             return
         }
 
+        // Log ALL requests for debugging (9.1.34+ issue)
+        let elapsed = Date().timeIntervalSince(tweakInitTime)
+        let elapsedInt = Int(elapsed)
+        let path = url.path
+        let host = url.host ?? ""
+        if path.contains("consent") || path.contains("product") || path.contains("state") {
+            writeDebugLog("[NET-DEBUG] Request: \(host)\(path) at \(elapsedInt)s")
+        }
+
         // Handle blocked endpoints (session protection)
         if shouldBlock(url) {
             handleBlockedEndpoint(url, task: task, session: session)
