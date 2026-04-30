@@ -85,22 +85,6 @@ class SPTAuthSessionHook: ClassHook<NSObject> {
         let elapsed = Int(Date().timeIntervalSince(tweakInitTime))
         writeDebugLog("[AUTH] productStateUpdated at \(elapsed)s -- \(state)")
         orig.productStateUpdated(state)
-        
-        // Intercept free-tier product state updates (9.1.34+ issue)
-        // If the new product state shows free tier, this means Spotify got fresh data from somewhere
-        // (likely ConsentProductStateDataLoaderImpl) and we need to re-patch
-        if let dict = state as? [String: Any] {
-            if let type = dict["type"] as? String, type == "free" {
-                writeDebugLog("[AUTH] WARNING: Free-tier productState detected at \(elapsed)s - possible re-fetch detected")
-                writeDebugLog("[AUTH] Full state keys: \(dict.keys.sorted())")
-                
-                // Force re-patch bootstrap if available
-                if EeveeSpotify.hookTarget == .v91 && UserDefaults.patchType == .requests {
-                    writeDebugLog("[AUTH] Requesting bootstrap re-patch...")
-                    // The next bootstrap will be intercepted and patched
-                }
-            }
-        }
     }
 
     func tryReconnect(_ arg1: AnyObject, toAP arg2: AnyObject) {
@@ -381,9 +365,7 @@ class URLSessionTaskResumeHook: ClassHook<NSObject> {
                 path.contains("auth/expire") ||
                 path.contains("product-state") ||
                 path.contains("melody") ||
-                path.contains("auth/v1") ||
-                path.contains("consent/product-state") ||
-                path.contains("productstate/productstate")
+                path.contains("auth/v1")
 
             if isAuthRelated {
                 let method = task.currentRequest?.httpMethod ?? "?"
@@ -435,10 +417,7 @@ class URLSessionTaskResumeHook: ClassHook<NSObject> {
                 }
                 // Block product state re-fetch endpoints (9.1.34+ ConsentProductStateDataLoaderImpl)
                 // These endpoints return fresh free-tier product state that overwrites our patches
-                if path.contains("consent/product-state") ||
-                   path.contains("productstate/productstate") ||
-                   path.contains("/product-state") ||
-                   path.contains("/productstate") {
+                if elapsed > 30 && (path.contains("consent/product-state") || path.contains("productstate")) {
                     writeDebugLog("[NET] Cancelled product-state fetch at \(elapsedInt)s")
                     task.cancel()
                     return
