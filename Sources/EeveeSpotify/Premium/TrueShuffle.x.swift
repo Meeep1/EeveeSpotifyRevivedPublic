@@ -105,10 +105,10 @@ enum TrueShuffleHookInstaller {
         if let weightedListMethod = class_getInstanceMethod(cls, weightedListSelector) {
             let weightedListBlock: @convention(block) (AnyObject, AnyObject, AnyObject) -> AnyObject? = {
                 _,
-                tracks,
+                _,
                 _
                 in
-                tracks
+                nil
             }
 
             method_setImplementation(weightedListMethod, imp_implementationWithBlock(weightedListBlock as Any))
