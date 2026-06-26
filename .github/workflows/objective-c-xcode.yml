@@ -1,30 +1,43 @@
-name: Xcode - Build and Analyze
+name: Xcode con Theos
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "principal" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "principal" ]
+  workflow_dispatch:
 
 jobs:
   build:
-    name: Build and analyse default scheme using xcodebuild command
     runs-on: macos-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Set Default Scheme
-        run: |
-          scheme_list=$(xcodebuild -list -json | tr -d "\n")
-          default=$(echo $scheme_list | ruby -e "require 'json'; puts JSON.parse(STDIN.gets)['project']['targets'][0]")
-          echo $default | cat >default
-          echo Using default scheme: $default
-      - name: Build
-        env:
-          scheme: ${{ 'default' }}
-        run: |
-          if [ $scheme = default ]; then scheme=$(cat default); fi
-          if [ "`ls -A | grep -i \\.xcworkspace\$`" ]; then filetype_parameter="workspace" && file_to_build="`ls -A | grep -i \\.xcworkspace\$`"; else filetype_parameter="project" && file_to_build="`ls -A | grep -i \\.xcodeproj\$`"; fi
-          file_to_build=`echo $file_to_build | awk '{$1=$1;print}'`
-          xcodebuild clean build analyze -scheme "$scheme" -"$filetype_parameter" "$file_to_build" | xcpretty && exit ${PIPESTATUS[0]}
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Setup Theos Environment
+      run: |
+        git clone --recursive https://github.com/theos/theos.git $HOME/theos
+        curl -LO https://github.com/theos/sdks/raw/master/iPhoneOS16.5.sdk.tar.xz
+        tar -xf iPhoneOS16.5.sdk.tar.xz -C $HOME/theos/sdks/
+        echo "THEOS=$HOME/theos" >> $GITHUB_ENV
+
+    - name: Initialize Theos SPM Configuration
+      run: |
+        export THEOS=$HOME/theos
+        make spm
+
+    - name: Run Xcodebuild List
+      run: |
+        export THEOS=$HOME/theos
+        scheme_list=$(xcodebuild -list -json | tr -d "\n")
+        echo "Schemes: $scheme_list"
+        
+        # Compilación del paquete final usando el Makefile
+        make package FINALPACKAGE=1
+
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: EeveeSpotifyBuild
+        path: packages/
